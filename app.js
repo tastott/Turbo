@@ -6,5 +6,6 @@ sensor.start(function(time){
 });
 
 process.stdin.on('data', function(key){
-   process.exit(); 
+    sensor.stop();
+    process.exit(); 
 });

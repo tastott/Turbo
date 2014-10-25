@@ -1,4 +1,4 @@
-export module sensor {
+module Sensor {
     export interface ISensorListener {
         start(onInput : (time : number) => void) : void;
     }
@@ -6,6 +6,10 @@ export module sensor {
     export class FakeSensorListener implements ISensorListener {
         start(onInput : (time : number) => void) {
             this.randomSense(onInput);
+        }
+        
+        stop(onStopped : () => void){
+            setTimeout(onStopped());
         }
         
         private randomSense(onInput : (time :number) => void){
