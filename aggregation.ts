@@ -12,7 +12,7 @@ module Aggregation{
         }
         
         Put(time : number) {
-            ++this._count;
+            this._count +=1;
         }
         
         Value() {

@@ -1,3 +1,32 @@
+var Aggregation;
+(function (Aggregation) {
+    var Counter = (function () {
+        function Counter() {
+            this._count = 0;
+        }
+        Counter.prototype.Put = function (time) {
+            this._count += 1;
+        };
+
+        Counter.prototype.Value = function () {
+            return this._count;
+        };
+        return Counter;
+    })();
+    Aggregation.Counter = Counter;
+})(Aggregation || (Aggregation = {}));
+///<reference path="./sensor.ts"/>
+///<reference path="./aggregation.ts" />
+///<reference path="./turbo-server.ts" />
+///<reference path="./turbo-service.ts" />
+
+var x;
+(function (x) {
+    exports.Sensor = Sensor;
+    exports.Aggregation = Aggregation;
+    exports.Service = Service;
+    exports.Server = Server;
+})(x || (x = {}));
 var Sensor;
 (function (Sensor) {
     var FakeSensorListener = (function () {
@@ -8,7 +37,8 @@ var Sensor;
         };
 
         FakeSensorListener.prototype.stop = function (onStopped) {
-            setTimeout(onStopped());
+            if (onStopped)
+                setTimeout(onStopped());
         };
 
         FakeSensorListener.prototype.randomSense = function (onInput) {
@@ -23,6 +53,43 @@ var Sensor;
     })();
     Sensor.FakeSensorListener = FakeSensorListener;
 })(Sensor || (Sensor = {}));
+///<reference path="./typings/node.d.ts" />
+///<reference path="./typings/restify.d.ts" />
+var Server;
+(function (Server) {
+    var restify = require('restify');
+
+    var TurboServer = (function () {
+        function TurboServer() {
+            var sensor = new Sensor.FakeSensorListener();
+            this._service = new Service.TurboService(sensor);
+        }
+        TurboServer.prototype.start = function () {
+            var _this = this;
+            var server = restify.createServer();
+            server.use(restify.CORS());
+
+            server.get('/test', function (req, res, next) {
+                res.send({
+                    hello: _this._service.get()
+                });
+                next();
+            });
+
+            this._service.start();
+
+            server.listen(8080, function () {
+                console.log('%s listening at %s', server.name, server.url);
+            });
+        };
+
+        TurboServer.prototype.stop = function (onStopped) {
+            this._service.stop(onStopped);
+        };
+        return TurboServer;
+    })();
+    Server.TurboServer = TurboServer;
+})(Server || (Server = {}));
 ///<reference path="./aggregation.ts" />
 ///<reference path="./sensor.ts" />
 var Service;
@@ -37,9 +104,14 @@ var Service;
             var _this = this;
             this._sensor.start(function (time) {
                 Object.keys(_this._aggs).forEach(function (aggName) {
+                    ;
                     _this._aggs[aggName].Put(time);
                 });
             });
+        };
+
+        TurboService.prototype.stop = function (onStopped) {
+            this._sensor.stop(onStopped);
         };
 
         TurboService.prototype.get = function () {
@@ -49,20 +121,25 @@ var Service;
     })();
     Service.TurboService = TurboService;
 })(Service || (Service = {}));
-var Aggregation;
-(function (Aggregation) {
-    var Counter = (function () {
-        function Counter() {
-            this._count = 0;
-        }
-        Counter.prototype.Put = function (time) {
-            ++this._count;
-        };
+///<reference path="./sensor.ts"/>
+///<reference path="./aggregation.ts" />
+///<reference path="./turbo-server.ts" />
+///<reference path="./turbo-service.ts" />
 
-        Counter.prototype.Value = function () {
-            return this._count;
+var x;
+(function (x) {
+    exports.Sensor = Sensor;
+    exports.Aggregation = Aggregation;
+    exports.Service = Service;
+    exports.Server = Server;
+
+    var y = (function () {
+        function y() {
+        }
+        y.prototype.z = function () {
+            console.log('blah');
         };
-        return Counter;
+        return y;
     })();
-    Aggregation.Counter = Counter;
-})(Aggregation || (Aggregation = {}));
+    x.y = y;
+})(x || (x = {}));

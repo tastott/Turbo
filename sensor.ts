@@ -1,6 +1,7 @@
 module Sensor {
     export interface ISensorListener {
         start(onInput : (time : number) => void) : void;
+        stop(onStopped : () => void);
     }
     
     export class FakeSensorListener implements ISensorListener {
@@ -9,7 +10,7 @@ module Sensor {
         }
         
         stop(onStopped : () => void){
-            setTimeout(onStopped());
+            if(onStopped) setTimeout(onStopped());
         }
         
         private randomSense(onInput : (time :number) => void){

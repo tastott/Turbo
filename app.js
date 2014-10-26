@@ -1,11 +1,13 @@
-var _sensor = require('./sensor').sensor;
+var _turbo = require('./turbo');
 
-var sensor = new _sensor.FakeSensorListener();
-sensor.start(function(time){
-    console.log(time);
-});
+var server = new _turbo.Server.TurboServer();
+server.start();
 
 process.stdin.on('data', function(key){
-    sensor.stop();
-    process.exit(); 
+    
+    server.stop(function(){
+        process.exit(); 
+    });
 });
+
+console.log('Press any key to stop');

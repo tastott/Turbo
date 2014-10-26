@@ -19,10 +19,14 @@ module Service {
         
         start(){
             this._sensor.start(time => {
-                Object.keys(this._aggs).forEach(aggName => {
+                Object.keys(this._aggs).forEach(aggName => {;
                     this._aggs[aggName].Put(time);
                 });
             });
+        }
+        
+        stop(onStopped: () => void){
+            this._sensor.stop(onStopped);    
         }
         
         get(){
