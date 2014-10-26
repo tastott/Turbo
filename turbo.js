@@ -52,6 +52,28 @@ var Sensor;
         return FakeSensorListener;
     })();
     Sensor.FakeSensorListener = FakeSensorListener;
+
+    var PythonSensorListener = (function () {
+        function PythonSensorListener(pin) {
+        }
+        PythonSensorListener.prototype.start = function (onInput) {
+            var childProcess = require('child_process');
+            this._gpioProcess = childProcess.spawn('python', ['test.py']);
+            this._gpioProcess.stdout.on('data', function (data) {
+                onInput(data);
+            });
+            this._gpioProcess.stderr.on('data', function (data) {
+                console.log('Error in python process: ' + data);
+            });
+        };
+
+        PythonSensorListener.prototype.stop = function (onStopped) {
+            this._gpioProcess.kill();
+            onStopped();
+        };
+        return PythonSensorListener;
+    })();
+    Sensor.PythonSensorListener = PythonSensorListener;
 })(Sensor || (Sensor = {}));
 ///<reference path="./typings/node.d.ts" />
 ///<reference path="./typings/restify.d.ts" />
