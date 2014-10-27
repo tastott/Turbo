@@ -11,7 +11,6 @@ module x{
     exports.Sensor = Sensor;
     exports.Aggregation = Aggregation;
     exports.Service = Service;
-    exports.Server=  Server;
     
     export class y{
         z(){

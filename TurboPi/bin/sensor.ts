@@ -1,7 +1,7 @@
 module Sensor {
     export interface ISensorListener {
         start(onInput : (time : number) => void) : void;
-        stop(onStopped : () => void);
+        stop(onStopped? : () => void);
     }
     
     export class FakeSensorListener implements ISensorListener {
@@ -9,7 +9,7 @@ module Sensor {
             this.randomSense(onInput);
         }
         
-        stop(onStopped : () => void){
+        stop(onStopped? : () => void){
             if(onStopped) setTimeout(onStopped());
         }
         
@@ -24,7 +24,7 @@ module Sensor {
     
    
 
-    export class PythonSensorListener{
+    export class PythonSensorListener implements ISensorListener{
         
         private _gpioProcess : any;
         
@@ -41,11 +41,14 @@ module Sensor {
 		    this._gpioProcess.stderr.on('data', function(data){
     			console.log('Error in python process: ' + data);
     		});
+    		process.on('SIGTERM', () => {
+              this.stop();
+            });
     	}
     	
-		stop(onStopped : () => void){
+		stop(onStopped? : () => void){
     		this._gpioProcess.kill();
-    		onStopped();
+    		if(onStopped) onStopped();
     	}
 	}
 }

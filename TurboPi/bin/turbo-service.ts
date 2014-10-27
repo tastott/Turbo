@@ -2,6 +2,7 @@
 ///<reference path="./sensor.ts" />
 
 module Service {
+    var _ = require('underscore');
     
     interface Aggregators{
         [index : string] : Aggregation.Aggregator;
@@ -13,8 +14,17 @@ module Service {
         
         constructor(sensor : Sensor.ISensorListener){
             this._sensor = sensor;
+            
+            var counter = new Aggregation.Counter();
+            var odometer = new Aggregation.Odometer(2);
+            var timer = new Aggregation.Timer();
+            var speedo = new Aggregation.Speedometer(odometer, timer);
+            
             this._aggs = {};
-            this._aggs['Count'] = new Aggregation.Counter();
+            this._aggs['Count'] = counter;
+            this._aggs['Timer'] = timer;
+            this._aggs['AverageSpeed'] = speedo;
+            this._aggs['Distance'] = odometer;
         }
         
         start(){
@@ -30,7 +40,10 @@ module Service {
         }
         
         get(){
-            return this._aggs['Count'].Value();
+            
+            return _.object(_.map(this._aggs, function (agg, key) {
+                return [key, agg.Value()];
+            }));
         }
     }
     
