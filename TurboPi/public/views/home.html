@@ -1,3 +1,14 @@
 
-<div segment-display text="{{distance.toFixed(3) + 'KM'}}"></div>
-<div segment-display text="{{speed.toFixed(2) + 'KPH'}}"></div>
+<div style="text-align: center; margin: auto">
+	<div>
+		<canvas width="600" height="160" segment-display text="{{distance.toFixed(3) + 'KM'}}"></canvas>
+	</div>
+	<div>
+		<canvas width="600" height="160" segment-display text="{{speed.toFixed(2) + 'KPH'}}"></canvas>
+	</div>
+</div>
+<div style="text-align: center; margin: auto">
+	<div style="color : white">
+		{{distance.toFixed(3)}}
+	</div>
+</div>

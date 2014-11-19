@@ -17,11 +17,11 @@ module directives{
             },
             link: (scope : ng.IScope, element : JQuery, attributes) => {
                 
-                var canvas = $('<canvas></canvas>').appendTo(element);
+                //var canvas = $('<canvas></canvas>').appendTo(element);
                 //canvas.width(element.width());
                 //canvas.height(element.height());
                 
-                var segment16 = new SixteenSegment(8, canvas[0]);
+                var segment16 = new SixteenSegment(8, element[0]);
                 segment16.FillDark = '#001100';
                 
                 scope.$watch('text', (newValue, oldValue) =>{
