@@ -1,7 +1,14 @@
+///<reference path="./typings/node.d.ts" />
+//import fs= require('fs');
+
 module Aggregation{
+    
+    var fs = require('fs');
+    
     export interface Aggregator {
         Put(time : number) : void;
         Value() : any;
+        Dispose? : () => void;
     }
     
     export class Counter implements Aggregator{
@@ -74,4 +81,32 @@ module Aggregation{
         }
     }
 
+    export class LogFile implements Aggregator{
+        
+        private _buffer : number[];
+        
+        constructor(private filePath : string, private bufferSize : number){
+            this._buffer = [];
+        }
+        
+        private Flush(){
+            var data= this._buffer.map(d => '\r\n' + d).join('');
+            fs.appendFile(this.filePath, data);
+            this._buffer = [];
+        }
+        
+        Put(time : number){
+            this._buffer.push(time);
+            
+            if(this._buffer.length > this.bufferSize) this.Flush();
+        }
+        
+        Value(){
+            return this.filePath;
+        }
+        
+        Dispose(){
+            if(this._buffer.length) this.Flush();
+        }
+    }
 }

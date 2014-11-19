@@ -25,18 +25,23 @@ module Service {
             this._aggs['Timer'] = timer;
             this._aggs['AverageSpeed'] = speedo;
             this._aggs['Distance'] = odometer;
+            this._aggs['LogFile'] = new Aggregation.LogFile('test.log', 100);
         }
         
         start(){
             this._sensor.start(time => {
-                Object.keys(this._aggs).forEach(aggName => {;
-                    this._aggs[aggName].Put(time);
+                _.values(this._aggs).forEach(agg => {;
+                    agg.Put(time);
                 });
             });
         }
         
         stop(onStopped: () => void){
-            this._sensor.stop(onStopped);    
+            this._sensor.stop(onStopped);   
+            
+           _.values(this._aggs).filter(agg => agg.Dispose).forEach(agg => {
+                agg.Dispose();
+            });
         }
         
         get(){
