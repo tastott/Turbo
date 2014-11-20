@@ -67,6 +67,7 @@ module Service {
             this.aggregators['Count'] = counter;
             this.aggregators['Timer'] = timer;
             this.aggregators['AverageSpeed'] = speedo;
+            this.aggregators['CurrentAverageSpeed'] = new Aggregation.RollingSpeedometer(3000, 2);
             this.aggregators['Distance'] = odometer;
             this.aggregators['LogFile'] = new Aggregation.LogFile('logs/' + id + '.log', 100);
         }

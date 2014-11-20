@@ -12,6 +12,7 @@ module controllers {
 		    $scope.distance = 0;
 		    $scope.speed = 0;
 		    $scope.time = 0;
+		    $scope.currentSpeed = 0;
 		    
 		    $scope.stopSession = () => {
 		        console.log('Stopping session...')
@@ -32,6 +33,7 @@ module controllers {
         		                $scope.distance = data.Distance / 1000;
         		                $scope.speed = data.AverageSpeed;
         		                $scope.time = data.Timer;
+        		                $scope.currentSpeed = data.CurrentAverageSpeed;
         		            });
         		    }, 2000);
 		        });

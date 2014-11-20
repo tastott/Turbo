@@ -80,6 +80,38 @@ module Aggregation{
             else return distanceKm/hours;
         }
     }
+    
+    export class RollingSpeedometer implements Aggregator {
+        private _times : number[];
+        
+        constructor(private windowLength : number, private unitDistance : number){
+            this._times = [];
+        }
+        
+        Put(time : number){
+            var now = new Date().getTime();
+            while(this._times.length && now - this._times[0] > this.windowLength){
+                this._times.shift();
+            }
+            this._times.push(time);
+        }
+        
+        Value(){
+            var now = new Date().getTime();
+            while(this._times.length && now - this._times[0] > this.windowLength){
+                this._times.shift();
+            }
+            
+            if(!this._times.length) return 0;
+            else {
+                var distanceKm = this._times.length * this.unitDistance / 1000;
+                var hours = (now - this._times[0]) / 3600000;
+                
+                if(!hours) return 0;
+                else return distanceKm/hours;
+            }
+        } 
+    }
 
     export class LogFile implements Aggregator{
         
