@@ -174,8 +174,9 @@ var Sensor;
         }
         PythonSensorListener.prototype.start = function (onInput) {
             var _this = this;
+            var pythonPath = require('path').resolve(__dirname, 'test.py');
             var childProcess = require('child_process');
-            this._gpioProcess = childProcess.spawn('python', ['test.py']);
+            this._gpioProcess = childProcess.spawn('python', [pythonPath]);
             this._gpioProcess.stdout.on('data', function (data) {
                 onInput(data);
             });
@@ -202,6 +203,7 @@ var Service;
 (function (Service) {
     var _ = require('underscore');
     var moment = require('moment');
+    var path = require('path');
 
     var TurboService = (function () {
         function TurboService(sensor) {

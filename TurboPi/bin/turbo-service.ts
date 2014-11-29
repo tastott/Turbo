@@ -4,6 +4,7 @@
 module Service {
     var _ = require('underscore');
     var moment = require('moment');
+    var path = require('path');
     
     interface Aggregators{
         [index : string] : Aggregation.Aggregator;
