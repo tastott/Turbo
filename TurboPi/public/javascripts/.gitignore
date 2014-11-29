@@ -1,4 +1,1 @@
-/app.js
-/home-controller.js
-/rideController.js
-/homeController.js
+*.gitignore~
