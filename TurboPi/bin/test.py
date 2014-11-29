@@ -31,7 +31,7 @@ GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 def onInput(channel):
 	now = time()
-	sys.stdout.write('{:.2f}'.format(now))
+	sys.stdout.write('{:.0f}'.format(now*1000))
 	sys.stdout.flush()
 
 
