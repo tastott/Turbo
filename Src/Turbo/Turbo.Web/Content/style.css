@@ -1,6 +1,11 @@
 body {
     background: black;
     color: white;
+    margin: 0;
+    position: absolute;
+    width: 100%;
+    /* top: 0; */
+    /* left: 0; */
 }
 
 .dashboard
@@ -9,23 +14,23 @@ body {
 }
 .numeric-display
 {
-	font-size: 80pt;
+	font-size: 32pt;
 	font-family: monospace;
 }
 
 .big-button div
 {
 	background: #86fd06;
-	border-radius: 16px;
-	width: 200px;
+	border-radius: 4px;
+	width: 40px;
 	/* height: 100px; */
 	vertical-align: middle;
 	margin: auto;
 	text-align: center;
 	color: black;
-	padding-top: 24px;
-	padding-bottom: 24px;
-	font-size: 8em;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	font-size: 1.5em;
 }
 
 .big-button div:hover
@@ -34,9 +39,14 @@ body {
 	color: #86fd06;
 }
 
+.centre {
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+}
+
 .centre-panel
 {
-	margin-top: 60px;
 	text-align: center; 
 	margin-left: auto;
 	margin-right: auto;

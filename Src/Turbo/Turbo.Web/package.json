@@ -2,9 +2,9 @@
   "name": "Turbo",
   "main": "index.html",
   "window": {
-    "toolbar": true,
-    "width": 800,
-    "height": 600
+    "toolbar": false,
+    "width": 320,
+    "height": 240
   },
   "version": "1.0.0",
   "dependencies": {
