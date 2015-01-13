@@ -1,0 +1,11 @@
+<div class="dashboard">
+	<div class="centre-panel">
+		<div class="numeric-display">{{distance.toFixed(3)}}km</div>
+		<div class="numeric-display">{{time | date:'HH:mm:ss'}}</div>
+		<div class="numeric-display">{{speed.toFixed(2)}}km/h</div>
+		<div class="numeric-display">{{currentSpeed.toFixed(2)}}km/h</div>
+		<div class="big-button" ng-click="stopSession()">
+			<div class="fa fa-stop"></div>
+		</div>
+	</div>
+</div>

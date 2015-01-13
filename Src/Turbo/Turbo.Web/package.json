@@ -1,0 +1,19 @@
+﻿{
+  "name": "Turbo",
+  "main": "index.html",
+  "window": {
+    "toolbar": true,
+    "width": 800,
+    "height": 600
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "underscore": "^1.7.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Stott",
+  "license": "ISC"
+}
