@@ -4,11 +4,12 @@ module controllers {
     export class HomeController {
         public static $inject = [
 			'$scope',
-			'$http'
 		];
 		
-		constructor($scope, $http){
-		    
+		constructor($scope){
+            $scope.exit = () => {
+                window.close();
+            }
 		}
     }
 }

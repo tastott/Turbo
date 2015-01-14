@@ -3,6 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbo.Web", "Turbo.Web\Turbo.Web.csproj", "{004F8130-03E2-4939-8977-922C2B43ABE6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{BE86037E-057D-41DB-ADDE-671EC904ABEF}"
+	ProjectSection(SolutionItems) = preProject
+		Build.proj = Build.proj
+		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
+		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

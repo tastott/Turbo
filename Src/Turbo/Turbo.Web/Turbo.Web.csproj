@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.Targets" />
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <ProjectGuid>{004F8130-03E2-4939-8977-922C2B43ABE6}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -17,63 +21,63 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="_content\font-awesome\css\font-awesome.css" />
-    <Content Include="_content\font-awesome\css\font-awesome.min.css" />
-    <Content Include="_content\font-awesome\fonts\fontawesome-webfont.svg" />
-    <Content Include="_content\style.css" />
+    <Content Include="content\font-awesome\css\font-awesome.css" />
+    <Content Include="content\font-awesome\css\font-awesome.min.css" />
+    <Content Include="content\font-awesome\fonts\fontawesome-webfont.svg" />
+    <Content Include="content\style.css" />
     <Content Include="index.html" />
-    <TypeScriptCompile Include="_scripts\services\aggregation.ts" />
-    <Content Include="_scripts\angular-route.min.js" />
-    <Content Include="_scripts\angular.js" />
-    <Content Include="_scripts\angular.min.js" />
-    <TypeScriptCompile Include="_scripts\app.ts" />
-    <TypeScriptCompile Include="_scripts\directives.ts" />
-    <TypeScriptCompile Include="_scripts\homeController.ts" />
-    <TypeScriptCompile Include="_scripts\rideController.ts" />
-    <TypeScriptCompile Include="_scripts\typings\angular-route.d.ts" />
-    <TypeScriptCompile Include="_scripts\typings\angular.d.ts" />
-    <TypeScriptCompile Include="_scripts\typings\jquery.d.ts" />
+    <TypeScriptCompile Include="scripts\services\aggregation.ts" />
+    <Content Include="scripts\angular-route.min.js" />
+    <Content Include="scripts\angular.js" />
+    <Content Include="scripts\angular.min.js" />
+    <TypeScriptCompile Include="scripts\app.ts" />
+    <TypeScriptCompile Include="scripts\directives.ts" />
+    <TypeScriptCompile Include="scripts\homeController.ts" />
+    <TypeScriptCompile Include="scripts\rideController.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
     <None Include="package.json" />
-    <TypeScriptCompile Include="_scripts\services\sensor.ts" />
-    <TypeScriptCompile Include="_scripts\services\turbo-service.ts" />
-    <TypeScriptCompile Include="_scripts\typings\node.d.ts" />
-    <Content Include="_scripts\typings\underscore\underscore.d.ts" />
-    <Content Include="_views\home.html" />
-    <Content Include="_views\ride.html" />
+    <TypeScriptCompile Include="scripts\services\sensor.ts" />
+    <TypeScriptCompile Include="scripts\services\turbo-service.ts" />
+    <TypeScriptCompile Include="scripts\typings\node.d.ts" />
+    <Content Include="scripts\typings\underscore\underscore.d.ts" />
+    <Content Include="views\home.html" />
+    <Content Include="views\ride.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="_content\font-awesome\less\bordered-pulled.less" />
-    <Content Include="_content\font-awesome\less\core.less" />
-    <Content Include="_content\font-awesome\less\fixed-width.less" />
-    <Content Include="_content\font-awesome\less\font-awesome.less" />
-    <Content Include="_content\font-awesome\less\icons.less" />
-    <Content Include="_content\font-awesome\less\larger.less" />
-    <Content Include="_content\font-awesome\less\list.less" />
-    <Content Include="_content\font-awesome\less\mixins.less" />
-    <Content Include="_content\font-awesome\less\path.less" />
-    <Content Include="_content\font-awesome\less\rotated-flipped.less" />
-    <Content Include="_content\font-awesome\less\spinning.less" />
-    <Content Include="_content\font-awesome\less\stacked.less" />
-    <Content Include="_content\font-awesome\less\variables.less" />
-    <Content Include="_content\font-awesome\fonts\fontawesome-webfont.eot" />
-    <Content Include="_content\font-awesome\fonts\fontawesome-webfont.ttf" />
-    <Content Include="_content\font-awesome\fonts\fontawesome-webfont.woff" />
-    <Content Include="_content\font-awesome\fonts\FontAwesome.otf" />
-    <Content Include="_content\font-awesome\scss\font-awesome.scss" />
-    <Content Include="_content\font-awesome\scss\_bordered-pulled.scss" />
-    <Content Include="_content\font-awesome\scss\_core.scss" />
-    <Content Include="_content\font-awesome\scss\_fixed-width.scss" />
-    <Content Include="_content\font-awesome\scss\_icons.scss" />
-    <Content Include="_content\font-awesome\scss\_larger.scss" />
-    <Content Include="_content\font-awesome\scss\_list.scss" />
-    <Content Include="_content\font-awesome\scss\_mixins.scss" />
-    <Content Include="_content\font-awesome\scss\_path.scss" />
-    <Content Include="_content\font-awesome\scss\_rotated-flipped.scss" />
-    <Content Include="_content\font-awesome\scss\_spinning.scss" />
-    <Content Include="_content\font-awesome\scss\_stacked.scss" />
-    <Content Include="_content\font-awesome\scss\_variables.scss" />
-    <Content Include="_scripts\services\test.py" />
+    <Content Include="content\font-awesome\less\bordered-pulled.less" />
+    <Content Include="content\font-awesome\less\core.less" />
+    <Content Include="content\font-awesome\less\fixed-width.less" />
+    <Content Include="content\font-awesome\less\font-awesome.less" />
+    <Content Include="content\font-awesome\less\icons.less" />
+    <Content Include="content\font-awesome\less\larger.less" />
+    <Content Include="content\font-awesome\less\list.less" />
+    <Content Include="content\font-awesome\less\mixins.less" />
+    <Content Include="content\font-awesome\less\path.less" />
+    <Content Include="content\font-awesome\less\rotated-flipped.less" />
+    <Content Include="content\font-awesome\less\spinning.less" />
+    <Content Include="content\font-awesome\less\stacked.less" />
+    <Content Include="content\font-awesome\less\variables.less" />
+    <Content Include="content\font-awesome\fonts\fontawesome-webfont.eot" />
+    <Content Include="content\font-awesome\fonts\fontawesome-webfont.ttf" />
+    <Content Include="content\font-awesome\fonts\fontawesome-webfont.woff" />
+    <Content Include="content\font-awesome\fonts\FontAwesome.otf" />
+    <Content Include="content\font-awesome\scss\font-awesome.scss" />
+    <Content Include="content\font-awesome\scss\_bordered-pulled.scss" />
+    <Content Include="content\font-awesome\scss\_core.scss" />
+    <Content Include="content\font-awesome\scss\_fixed-width.scss" />
+    <Content Include="content\font-awesome\scss\_icons.scss" />
+    <Content Include="content\font-awesome\scss\_larger.scss" />
+    <Content Include="content\font-awesome\scss\_list.scss" />
+    <Content Include="content\font-awesome\scss\_mixins.scss" />
+    <Content Include="content\font-awesome\scss\_path.scss" />
+    <Content Include="content\font-awesome\scss\_rotated-flipped.scss" />
+    <Content Include="content\font-awesome\scss\_spinning.scss" />
+    <Content Include="content\font-awesome\scss\_stacked.scss" />
+    <Content Include="content\font-awesome\scss\_variables.scss" />
+    <Content Include="scripts\services\test.py" />
     <Content Include="packages.config" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
@@ -113,7 +117,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
-    <TypeScriptSourceMap>true</TypeScriptSourceMap>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -123,4 +127,11 @@
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
+  <Target Name="AfterBuild">
+    <ItemGroup>
+      <DeploymentFiles Include="**\*.*" Exclude="obj\**;bin\**;logs\**;**\*.ts"/>
+    </ItemGroup>
+    <Zip Files="@(DeploymentFiles)" 
+        ZipFileName="..\..\..\Release\Turbo.nw" />
+  </Target>
 </Project>
