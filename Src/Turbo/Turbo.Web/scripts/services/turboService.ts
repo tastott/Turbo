@@ -1,7 +1,7 @@
 ///<reference path="../typings/angular.d.ts"/>
 ///<reference path="./aggregation.ts" />
 ///<reference path="./sensor.ts" />
-
+///<reference path="../utilities.ts"/>
 module Service {
     var _ = require('underscore');
     var moment = require('moment');
@@ -70,7 +70,8 @@ module Service {
             this.aggregators['CurrentAverageSpeed'] = new Aggregation.RollingSpeedometer(3000, 2);
             this.aggregators['Distance'] = odometer;
 
-            if (this.logPath) this.aggregators['LogFile'] = new Aggregation.LogFile(this.logPath + '/' + id + '.log', 100);
+            if (this.logPath != undefined && this.logPath != null)
+                this.aggregators['LogFile'] = new Aggregation.LogFile(Utilities.resolve(this.logPath + '/' + id + '.log'), 100);
         }
         
         update(time : number){
