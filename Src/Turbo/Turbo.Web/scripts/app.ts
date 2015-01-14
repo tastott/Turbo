@@ -3,12 +3,21 @@
 ///<reference path="./homeController.ts" />
 ///<reference path="./rideController.ts" />
 ///<reference path="./directives.ts" />
-///<reference path="Services/turbo-service.ts"/>
+///<reference path="Services/turboService.ts"/>
 ///<reference path="Services/sensor.ts"/>
+///<reference path="./args.ts" />
 module turbo {
-    console.log('inside turbo module');
+
     angular.module('turboApp', ['ngRoute'])
-        .service('turboService', () => new Service.TurboService(new Sensor.FakeSensorListener()))
+        .service('args', () => Args.GetCLArgs())
+        .service('turboService', ['args', args => {
+            var wheelSensorPin = args['wheel-sensor'];
+            var wheelSensorListener: Sensor.ISensorListener;
+            if (wheelSensorPin) wheelSensorListener = new Sensor.PythonSensorListener(wheelSensorPin);
+            else wheelSensorListener = new Sensor.FakeSensorListener();
+
+            return new Service.TurboService(wheelSensorListener, args['logs']);
+        }])
         .controller('homeController', controllers.HomeController)
         .controller('rideController', controllers.RideController)
         //.directive('segmentDisplay', directives.SegmentDisplay)

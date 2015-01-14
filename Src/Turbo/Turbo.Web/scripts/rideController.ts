@@ -1,15 +1,18 @@
 ///<reference path="./typings/angular.d.ts" />
-///<reference path="Services/turbo-service.ts" />
+///<reference path="Services/turboService.ts" />
 
 module controllers {
     export class RideController {
         public static $inject = [
 			'$scope',
-			'turboService',
+            'turboService',
 			'$location'
 		];
 		
-        constructor($scope, turboService : Service.TurboService, $location){
+        constructor($scope,
+            turboService: Service.TurboService,
+            $location
+        ) {
 		    $scope.distance = 0;
 		    $scope.speed = 0;
 		    $scope.time = 0;

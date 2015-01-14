@@ -12,12 +12,10 @@ module Service {
     }
     
     export class TurboService{
-        private _sensor : Sensor.ISensorListener;
         private _session : TurboSession;
         
-        constructor(sensor : Sensor.ISensorListener){
-            this._sensor = sensor;
-            this._sensor.start(time => {
+        constructor(private sensor : Sensor.ISensorListener, private logPath : string){
+            this.sensor.start(time => {
                 if(this._session) this._session.update(time);
             });
         }
@@ -26,7 +24,7 @@ module Service {
            if(this._session) this._session.dispose();
            
            var id = moment().format('YYYYMMDDHHmmss');
-           this._session = new TurboSession(id);
+           this._session = new TurboSession(id, this.logPath);
            
            return id;
         }
@@ -42,7 +40,7 @@ module Service {
         }
         
         stop(onStopped: () => void){
-            this._sensor.stop(onStopped);   
+            this.sensor.stop(onStopped);   
             
            
         }
@@ -59,19 +57,20 @@ module Service {
     class TurboSession {
         public aggregators : Aggregators;
          
-        constructor(public id : string){
+        constructor(public id : string, private logPath : string){
             var counter = new Aggregation.Counter();
             var odometer = new Aggregation.Odometer(2);
             var timer = new Aggregation.Timer();
             var speedo = new Aggregation.Speedometer(odometer, timer);
-            
+
             this.aggregators = {};
             this.aggregators['Count'] = counter;
             this.aggregators['Timer'] = timer;
             this.aggregators['AverageSpeed'] = speedo;
             this.aggregators['CurrentAverageSpeed'] = new Aggregation.RollingSpeedometer(3000, 2);
             this.aggregators['Distance'] = odometer;
-            this.aggregators['LogFile'] = new Aggregation.LogFile('logs/' + id + '.log', 100);
+
+            if (this.logPath) this.aggregators['LogFile'] = new Aggregation.LogFile(this.logPath + '/' + id + '.log', 100);
         }
         
         update(time : number){

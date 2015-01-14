@@ -1,16 +1,19 @@
-﻿{
+{
   "name": "Turbo",
+  "description": "Turbo Trainer App",
   "main": "index.html",
   "window": {
-    "toolbar": false,
-	"frame": false,
+    "toolbar": true,
+    "frame": false,
     "width": 320,
     "height": 240
   },
-  "version": "1.0.0",
   "dependencies": {
+    "minimist": "^1.1.0",
+    "moment": "^2.9.0",
     "underscore": "^1.7.0"
   },
+  "version": "1.0.0",
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

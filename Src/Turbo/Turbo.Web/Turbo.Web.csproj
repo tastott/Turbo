@@ -37,10 +37,10 @@
     <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
-    <None Include="package.json" />
     <TypeScriptCompile Include="scripts\services\sensor.ts" />
-    <TypeScriptCompile Include="scripts\services\turbo-service.ts" />
+    <TypeScriptCompile Include="scripts\services\turboService.ts" />
     <TypeScriptCompile Include="scripts\typings\node.d.ts" />
+    <Content Include="scripts\args.ts" />
     <Content Include="scripts\typings\underscore\underscore.d.ts" />
     <Content Include="views\home.html" />
     <Content Include="views\ride.html" />
@@ -79,6 +79,7 @@
     <Content Include="content\font-awesome\scss\_variables.scss" />
     <Content Include="scripts\services\test.py" />
     <Content Include="packages.config" />
+    <Content Include="package.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -129,9 +130,8 @@
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="AfterBuild">
     <ItemGroup>
-      <DeploymentFiles Include="**\*.*" Exclude="obj\**;bin\**;logs\**;**\*.ts"/>
+      <DeploymentFiles Include="**\*.*" Exclude="obj\**;bin\**;logs\**;**\*.ts" />
     </ItemGroup>
-    <Zip Files="@(DeploymentFiles)" 
-        ZipFileName="..\..\..\Release\Turbo.nw" />
+    <Zip Files="@(DeploymentFiles)" ZipFileName="..\..\..\Release\Turbo.nw" />
   </Target>
 </Project>
