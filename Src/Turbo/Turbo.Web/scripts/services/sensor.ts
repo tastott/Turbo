@@ -35,7 +35,7 @@ module Sensor {
 	    }
 	    
     	start(onInput : (time : number) => void){
-    	    var pythonPath = Utilities.resolve('test.py');
+    	    var pythonPath = require('path').resolve('test.py');
 	        var childProcess = require('child_process');
 		    this._gpioProcess = childProcess.spawn('python',[pythonPath]);
     		this._gpioProcess.stdout.on('data', function(data){
