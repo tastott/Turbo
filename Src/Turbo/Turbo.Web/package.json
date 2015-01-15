@@ -11,7 +11,8 @@
   "dependencies": {
     "minimist": "^1.1.0",
     "moment": "^2.9.0",
-    "underscore": "^1.7.0"
+    "underscore": "^1.7.0",
+	"onoff": "^1.0.0"
   },
   "version": "1.0.0",
   "devDependencies": {},

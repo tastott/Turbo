@@ -23,8 +23,32 @@ module Sensor {
             }, delay);
         }
     }
-    
-   
+
+    var onoff = require('onoff');
+
+    export class OnOffSensorListener implements ISensorListener {
+        private _input: any;
+
+        constructor(private pin: number) {
+        }
+
+        start(onInput: (time: number) => void) {
+            this._input = new onoff.Gpio(this.pin, 'in', 'rising');
+            this._input.watch(function (err, value) {
+                if (err) throw err;
+                onInput(new Date().getTime());
+            });
+        }
+
+        stop(onStopped?: () => void) {
+            if (this._input) {
+                this._input.unexport();
+                this._input = null;
+            }
+
+            if (onStopped) setTimeout(onStopped());
+        }
+    }
 
     export class PythonSensorListener implements ISensorListener{
         
