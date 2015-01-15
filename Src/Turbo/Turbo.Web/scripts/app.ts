@@ -13,7 +13,7 @@ module turbo {
         .service('turboService', ['args', args => {
             var wheelSensorPin = args['wheel-sensor'];
             var wheelSensorListener: Sensor.ISensorListener;
-            if (wheelSensorPin) new Sensor.OnOffSensorListener(wheelSensorPin)
+            if (wheelSensorPin) wheelSensorListener = new Sensor.OnOffSensorListener(wheelSensorPin)
                 //wheelSensorListener = new Sensor.PythonSensorListener(wheelSensorPin);
             else wheelSensorListener = new Sensor.FakeSensorListener();
 
