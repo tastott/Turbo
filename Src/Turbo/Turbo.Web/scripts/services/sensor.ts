@@ -25,7 +25,7 @@ module Sensor {
     }
 
     var childProcess = require('child_process');
-    var onOffPath = Utilities.resolve('onoff.js');
+    var onOffPath = require('path').resolve('scripts/services/onoff.js');
 
     export class OnOffSensorListener implements ISensorListener {
         private child: any;
