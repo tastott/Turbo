@@ -1,5 +1,5 @@
 ///<reference path="../utilities.ts"/>
-
+///<reference path="../typings/node.d.ts" />
 module Sensor {
     export interface ISensorListener {
         start(onInput : (time : number) => void) : void;
@@ -24,26 +24,27 @@ module Sensor {
         }
     }
 
-    var onoff = require('onoff');
+    var childProcess = require('child_process');
+    var onOffPath = Utilities.resolve('onoff.js');
 
     export class OnOffSensorListener implements ISensorListener {
-        private _input: any;
+        private child: any;
 
         constructor(private pin: number) {
         }
 
         start(onInput: (time: number) => void) {
-            this._input = new onoff.Gpio(this.pin, 'in', 'rising');
-            this._input.watch(function (err, value) {
-                if (err) throw err;
-                onInput(new Date().getTime());
+            this.child = childProcess.spawn('node', [onOffPath, this.pin], {
+                stdio: ['ipc']
             });
+            this.child.on('message', function (data) {
+                onInput(data);
+            }); 
         }
 
         stop(onStopped?: () => void) {
-            if (this._input) {
-                this._input.unexport();
-                this._input = null;
+            if (this.child) {
+                this.child.kill();
             }
 
             if (onStopped) setTimeout(onStopped());

@@ -41,6 +41,7 @@
     <TypeScriptCompile Include="scripts\services\turboService.ts" />
     <TypeScriptCompile Include="scripts\typings\node.d.ts" />
     <Content Include="scripts\args.ts" />
+    <Content Include="scripts\services\onoff.js" />
     <Content Include="scripts\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="scripts\utilities.ts" />
     <Content Include="views\home.html" />
