@@ -8,7 +8,7 @@ module controllers {
 		
 		constructor($scope){
             $scope.exit = () => {
-                window.close();
+                require('nw.gui').App.quit();
             }
 		}
     }
