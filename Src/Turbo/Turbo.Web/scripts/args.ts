@@ -1,14 +1,11 @@
 ﻿///<reference path="typings/node.d.ts" />
+///<reference path="typings/node-webkit/node-webkit.d.ts"/>
 
-module Args {
+import nwgui = require('nw.gui');
+var minimist = require('minimist');
 
-    var nwgui = require('nw.gui');
-    var minimist = require('minimist');
+export function GetCLArgs(){
+    var args = minimist(nwgui.App.argv);
 
-    export function GetCLArgs(){
-        var args = minimist(nwgui.App.argv);
-
-        return args;
-    }
-
+    return args;
 }
