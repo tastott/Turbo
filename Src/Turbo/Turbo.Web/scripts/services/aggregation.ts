@@ -141,4 +141,28 @@ module Aggregation{
             if(this._buffer.length) this.Flush();
         }
     }
+
+    export class RollingTimeSeries implements Aggregator {
+        private lastTime: number;
+        private data: any[][];
+
+        constructor(private aggregator: Aggregator, private interval: number, private windowLength : number) {
+            this.lastTime = 0;
+            this.data = [];
+        }
+
+        Put(time: number) {
+            if (time > this.lastTime + this.interval) {
+                this.data.push([time, this.aggregator.Value()]);
+                while (this.data.length > this.windowLength) this.data.shift();
+            }
+        }
+
+        Value() {
+            return this.data;
+        }
+
+        Dispose() {
+        }
+    }
 }

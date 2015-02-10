@@ -62,6 +62,7 @@ module Service {
             var odometer = new Aggregation.Odometer(2);
             var timer = new Aggregation.Timer();
             var speedo = new Aggregation.Speedometer(odometer, timer);
+            var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
 
             this.aggregators = {};
             this.aggregators['Count'] = counter;
@@ -69,6 +70,7 @@ module Service {
             this.aggregators['AverageSpeed'] = speedo;
             this.aggregators['CurrentAverageSpeed'] = new Aggregation.RollingSpeedometer(3000, 2);
             this.aggregators['Distance'] = odometer;
+            this.aggregators['SpeedSeries'] = speedSeries;
 
             if (this.logPath != undefined && this.logPath != null)
                 this.aggregators['LogFile'] = new Aggregation.LogFile(Utilities.resolve(this.logPath + '/' + id + '.log'), 100);
