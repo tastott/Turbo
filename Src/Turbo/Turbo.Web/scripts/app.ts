@@ -20,7 +20,7 @@ module turbo {
     }
 
 
-    angular.module('turboApp', ['ngRoute'])
+    angular.module('turboApp', ['ngRoute', 'angular-carousel'])
         .service('args', () => _args)
         .service('turboService', ['args', args => {
             var wheelSensorPin = args['wheel-sensor'];
