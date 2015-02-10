@@ -8,8 +8,20 @@
 ///<reference path="./args.ts" />
 module turbo {
 
+    var _args = Args.GetCLArgs();
+
+    //Fiddle a few things in dev mode
+    if (_args['dev-mode']) {
+        var gui = require('nw.gui');
+        var thisWindow = gui.Window.get();
+        thisWindow.isFullscreen = false;
+        thisWindow.width = 320;
+        thisWindow.height = 240;
+    }
+
+
     angular.module('turboApp', ['ngRoute'])
-        .service('args', () => Args.GetCLArgs())
+        .service('args', () => _args)
         .service('turboService', ['args', args => {
             var wheelSensorPin = args['wheel-sensor'];
             var wheelSensorListener: Sensor.ISensorListener;
