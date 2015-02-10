@@ -16,7 +16,7 @@ module turbo {
         var thisWindow = gui.Window.get();
         thisWindow.isFullscreen = false;
         thisWindow.width = 320;
-        thisWindow.height = 240;
+        thisWindow.height = 280;
     }
 
 

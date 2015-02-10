@@ -1,39 +1,84 @@
+html{
+    height:100%;
+}
+
 body {
     background: black;
     color: white;
     margin: 0;
     position: absolute;
     width: 100%;
-    /* top: 0; */
-    /* left: 0; */
+    height:100%;
 }
 
+.page{
+    text-align:center;
+}
 .dashboard
 {
 	color: #86fd06;
+    height: calc(100% - 40px);
+    margin: 0;
 }
+
+.dashboard > li
+{
+    text-align:center;
+}
+
+.dashboard .numeric-display
+{
+    margin-left: auto;
+    margin-right: auto;
+    width: auto;
+}
+
 .numeric-display
 {
+    color: #86fd06;
 	font-size: 32pt;
 	font-family: monospace;
+    -webkit-user-select: none;
+}
+
+.big-button, .bigger-button
+{
+    display: inline;
+    margin-right: 10px;
+    margin-left:10px;
 }
 
 .big-button div
 {
-	background: #86fd06;
-	border-radius: 4px;
+    border-radius: 4px;
 	width: 40px;
+    padding-top: 6px;
+	padding-bottom: 6px;
+	font-size: 1.5em;
+}
+
+.bigger-button div
+{
+    border-radius: 8px;
+	width: 80px;
+    padding-top: 12px;
+	padding-bottom: 12px;
+	font-size: 3em;
+}
+
+.big-button div, .bigger-button div
+{
+	background: #86fd06;
+	
 	/* height: 100px; */
 	vertical-align: middle;
 	margin: auto;
 	text-align: center;
 	color: black;
-	padding-top: 6px;
-	padding-bottom: 6px;
-	font-size: 1.5em;
+	
 }
 
-.big-button div:hover
+.big-button div:hover,.bigger-button div:hover
 {
 	background: black;
 	color: #86fd06;
