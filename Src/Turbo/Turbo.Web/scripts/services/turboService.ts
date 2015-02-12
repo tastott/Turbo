@@ -10,21 +10,62 @@ module Service {
     interface Aggregators{
         [index : string] : Aggregation.Aggregator;
     }
+
+    export interface SessionContext {
+        Id: string;
+    }
+
+    export interface SensorConfig {
+        GetSensor: () => Sensor.ISensorListener;
+        GetAggregators(context: SessionContext): Aggregation.Aggregator[]
+    }
+
+    export interface TurboConfig {
+        SensorConfigs: {
+            [index: string]: SensorConfig
+        }
+    }
+
+    class SensorSession {
+        private sensor: Sensor.ISensorListener;
+
+        constructor(private config: SensorConfig) {
+
+        }
+
+        start() {
+            this.confi
+        }
+
+        stop() {
+        }
+    }
     
     export class TurboService{
         private _session : TurboSession;
         
-        constructor(private sensor : Sensor.ISensorListener, private logPath : string){
-            this.sensor.start(time => {
-                if(this._session) this._session.update(time);
+        constructor(private config: TurboConfig) {
+
+            this.forEachSensor((sensorId, sensorConfig) => {
+                sensorConfig.Sensor.start(time => {
+                    if (this._session) {
+                        this._session.update(sensorId, time);
+                    }
+                });
             });
         }
+
+        private forEachSensor(action: (sensorId: string, sensorConfig: SensorConfig) => void) {
+            Object.keys(this.config.SensorConfigs).forEach(sensorId => {
+                action(sensorId, this.config.SensorConfigs[sensorId]);
+            });
+        } 
         
         startSession(){
            if(this._session) this._session.dispose();
            
            var id = moment().format('YYYYMMDDHHmmss');
-           this._session = new TurboSession(id, this.logPath);
+           this._session = new TurboSession(id, this.config);
            
            return id;
         }
@@ -39,10 +80,10 @@ module Service {
             else return null;
         }
         
-        stop(onStopped: () => void){
-            this.sensor.stop(onStopped);   
-            
-           
+        stop(onStopped: () => void) {
+            this.forEachSensor((sensorId, sensorConfig) => {
+                sensorConfig.Sensor.stop(onStopped);
+            });       
         }
         
         getSessionData(){
@@ -57,7 +98,11 @@ module Service {
     class TurboSession {
         public aggregators : Aggregators;
          
-        constructor(public id : string, private logPath : string){
+        constructor(public id: string, config: TurboConfig) {
+            
+        }
+
+        blah(){
             var counter = new Aggregation.Counter();
             var odometer = new Aggregation.Odometer(2);
             var timer = new Aggregation.Timer();

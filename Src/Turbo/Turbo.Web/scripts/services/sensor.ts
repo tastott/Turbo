@@ -1,18 +1,47 @@
 ///<reference path="../utilities.ts"/>
 ///<reference path="../typings/node.d.ts" />
+
 module Sensor {
     export interface ISensorListener {
-        start(onInput : (time : number) => void) : void;
-        stop(onStopped? : () => void);
+        subscribe(onInput: (time: number) => void);
+        start() : void;
+        stop(): Q.Promise<void>;
+    }
+
+    interface SensorSubscription {
+        (time: number) : void;
+    }
+
+    export class BaseSensorListener {
+        private subs: SensorSubscription[];
+
+        constructor() {
+            this.subs = [];
+        }
+
+        subscribe(sub : SensorSubscription) {
+            this.subs.push(sub);
+        }
+
+        onInput(time: number) {
+            this.subs.forEach(sub => {
+                sub(time);
+            });
+        }
     }
     
-    export class FakeSensorListener implements ISensorListener {
-        start(onInput : (time : number) => void) {
-            this.randomSense(onInput);
+    export class FakeSensorListener extends BaseSensorListener implements ISensorListener {
+        private timer: NodeJS.Timer;
+
+        start() {
+            this.timer = setInterval(() => {
+            }, 
         }
-        
-        stop(onStopped? : () => void){
-            if(onStopped) setTimeout(onStopped());
+
+        stop() {
+            var deferred = Q.defer<void>();
+            deferred.resolve(<void>null);
+            return deferred.promise;      
         }
         
         private randomSense(onInput : (time :number) => void){

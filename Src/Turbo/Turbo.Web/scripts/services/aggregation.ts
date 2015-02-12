@@ -81,36 +81,59 @@ module Aggregation{
         }
     }
     
-    export class RollingSpeedometer implements Aggregator {
-        private _times : number[];
-        
-        constructor(private windowLength : number, private unitDistance : number){
+    export class RollingAggregator implements Aggregator {
+        private _times: number[];
+
+        constructor(private windowLength: number,
+            private aggregate : (times : number[]) => any) {
             this._times = [];
         }
-        
-        Put(time : number){
+
+        Put(time: number) {
             var now = new Date().getTime();
-            while(this._times.length && now - this._times[0] > this.windowLength){
+            while (this._times.length && now - this._times[0] > this.windowLength) {
                 this._times.shift();
             }
             this._times.push(time);
         }
-        
-        Value(){
+
+        Value() {
             var now = new Date().getTime();
-            while(this._times.length && now - this._times[0] > this.windowLength){
+            while (this._times.length && now - this._times[0] > this.windowLength) {
                 this._times.shift();
             }
-            
-            if(!this._times.length) return 0;
+
+            if (!this._times.length) return 0;
             else {
-                var distanceKm = this._times.length * this.unitDistance / 1000;
-                var hours = (now - this._times[0]) / 3600000;
-                
-                if(!hours) return 0;
-                else return distanceKm/hours;
+                return this.aggregate(this._times);
             }
-        } 
+        }
+    }
+
+    export class RollingSpeedometer extends RollingAggregator {
+ 
+        constructor(windowLength: number, unitDistance: number) {
+            super(windowLength,(times: number[]) => {
+                var now = new Date().getTime();
+                var distanceKm = times.length * unitDistance / 1000;
+                var hours = (now - times[0]) / 3600000;
+
+                if (!hours) return 0;
+                else return distanceKm / hours;
+            });
+        }
+    }
+
+    export class RollingCadenceometer extends RollingAggregator {
+        constructor(windowLength: number) {
+            super(windowLength,(times: number[]) => {
+                var now = new Date().getTime();
+                var minutes = (now - times[0]) / 60000;
+
+                if (!minutes) return 0;
+                else return times.length / minutes;
+            });
+        }
     }
 
     export class LogFile implements Aggregator{
