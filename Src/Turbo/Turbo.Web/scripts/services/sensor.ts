@@ -34,19 +34,20 @@ module Sensor {
         private timer: NodeJS.Timer;
 
         start() {
-            this.timer = setInterval(() => {
-            }, 
+            this.randomSense(time => this.onInput(time));
         }
 
         stop() {
             var deferred = Q.defer<void>();
+
+            if (this.timer) clearTimeout(this.timer);
             deferred.resolve(<void>null);
             return deferred.promise;      
         }
         
         private randomSense(onInput : (time :number) => void){
             var delay = 200 + (Math.random() *50);
-            setTimeout(() => {
+            this.timer = setTimeout(() => {
                 onInput(new Date().getTime());
                 this.randomSense(onInput);
             }, delay);
@@ -56,31 +57,36 @@ module Sensor {
     var childProcess = require('child_process');
     var onOffPath = require('path').resolve('scripts/services/onoff.js');
 
-    export class OnOffSensorListener implements ISensorListener {
+    export class OnOffSensorListener extends BaseSensorListener implements ISensorListener {
         private child: any;
+        private started: boolean;
 
         constructor(private pin: number) {
-        }
-
-        start(onInput: (time: number) => void) {
+            super();
             this.child = childProcess.spawn('node', [onOffPath, this.pin], {
                 stdio: ['ipc']
             });
-            this.child.on('message', function (data) {
-                onInput(data);
+            this.child.on('message', data => {
+                if (this.started) this.onInput(data);
             }); 
         }
 
-        stop(onStopped?: () => void) {
+        start() {
+            this.started = true;
+        }
+
+        stop() : Q.Promise<void> {
             if (this.child) {
                 this.child.kill();
             }
 
-            if (onStopped) setTimeout(onStopped());
+            var deferred = Q.defer<void>();
+            deferred.resolve(<void>null);
+            return deferred.promise;
         }
     }
 
-    export class PythonSensorListener implements ISensorListener{
+    /*export class PythonSensorListener implements ISensorListener{
         
         private _gpioProcess : any;
         
@@ -107,5 +113,5 @@ module Sensor {
     		this._gpioProcess.kill();
     		if(onStopped) onStopped();
     	}
-	}
+	}*/
 }

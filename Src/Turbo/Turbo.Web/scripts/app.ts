@@ -19,17 +19,18 @@ module turbo {
         thisWindow.height = 280;
     }
 
+    function GetSensor(pin): Sensor.ISensorListener{
+        if (pin) return new Sensor.OnOffSensorListener(pin)
+        else return new Sensor.FakeSensorListener();
+    }
 
     angular.module('turboApp', ['ngRoute', 'angular-carousel'])
         .service('args', () => _args)
         .service('turboService', ['args', args => {
             var wheelSensorPin = args['wheel-sensor'];
-            var wheelSensorListener: Sensor.ISensorListener;
-            if (wheelSensorPin) wheelSensorListener = new Sensor.OnOffSensorListener(wheelSensorPin)
-                //wheelSensorListener = new Sensor.PythonSensorListener(wheelSensorPin);
-            else wheelSensorListener = new Sensor.FakeSensorListener();
+            var crankSensorPin = args['crank-sensor'];
 
-            return new Service.TurboService(wheelSensorListener, args['logs']);
+            return new Service.TurboService(() => GetSensor(wheelSensorPin), () => GetSensor(crankSensorPin));
         }])
         .controller('homeController', controllers.HomeController)
         .controller('rideController', controllers.RideController)

@@ -20,25 +20,31 @@ module controllers {
 		    
 		    $scope.stopSession = () => {
 		        console.log('Stopping session...')
-		        var sessionId = turboService.stopSession();
-		        console.log('Stopped session: ' + sessionId);
-		        $location.path('#/home');
+                turboService.stopSession()
+                    .then(id => {
+                        console.log('Stopped session: ' + id);
+                        $location.path('#/home');
+                    });
 		    };
 
-            var sessionId = turboService.startSession();
-		    console.log('Started new session: ' + sessionId);
+            turboService.startSession()
+                .then(id => {
+                    console.log('Started new session: ' + id);
 
-            $scope.update = () => {
-                $scope.$apply(() => {
-                    var data = turboService.getSessionData();
-                    $scope.distance = data.Distance / 1000;
-                    $scope.speed = data.AverageSpeed;
-                    $scope.time = data.Timer;
-                    $scope.currentSpeed = data.CurrentAverageSpeed;
+                    $scope.update = () => {
+                        $scope.$apply(() => {
+                            var data = turboService.getSessionData();
+                            $scope.distance = data['Wheel']['Distance']  / 1000;
+                            $scope.speed = data['Wheel']['AverageSpeed'];
+                            $scope.time = data['Wheel']['Timer'];
+                            $scope.currentSpeed = data['Wheel']['CurrentAverageSpeed'];
+                        });
+                    };
+
+                    setInterval($scope.update, 2000);
                 });
-            };
                 
-		    setInterval($scope.update, 2000);
+		   
 		}
     }
 }
