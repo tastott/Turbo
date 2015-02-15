@@ -35,6 +35,11 @@ import Q = require('q')
     export class FakeSensorListener extends BaseSensorListener implements ISensorListener {
         private timer: NodeJS.Timer;
 
+        constructor(private frequency: number, private variance: number) {
+            super();
+
+        }
+
         start() {
             this.randomSense(time => this.onInput(time));
         }
@@ -45,7 +50,7 @@ import Q = require('q')
         }
         
         private randomSense(onInput : (time :number) => void){
-            var delay = 200 + (Math.random() *50);
+            var delay = (1000 / this.frequency) + (Math.random() * (1000 / this.frequency) * this.variance);
             this.timer = setTimeout(() => {
                 onInput(new Date().getTime());
                 this.randomSense(onInput);

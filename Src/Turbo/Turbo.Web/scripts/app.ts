@@ -17,9 +17,9 @@ if (_args['dev-mode']) {
     thisWindow.height = 280;
 }
 
-function GetSensor(pin) : Sensor.ISensorListener{
+function GetSensor(pin, fakeFrequency :number) : Sensor.ISensorListener{
     if (pin) return new Sensor.OnOffSensorListener(pin)
-    else return new Sensor.FakeSensorListener();
+    else return new Sensor.FakeSensorListener(fakeFrequency, 0.1);
 }
 
 var wAngular: ng.IAngularStatic = (<any>window).angular; //Dirty workaround because statically-loaded scripts aren't available as global variables in this context
@@ -29,7 +29,7 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
         var wheelSensorPin = args['wheel-sensor'];
         var crankSensorPin = args['crank-sensor'];
 
-        return new Service.TurboService(() => GetSensor(wheelSensorPin), () => GetSensor(crankSensorPin));
+        return new Service.TurboService(() => GetSensor(wheelSensorPin, 5), () => GetSensor(crankSensorPin, 1.5));
     }])
     .controller('homeController', controllers.HomeController)
     .controller('rideController', controllers.RideController)

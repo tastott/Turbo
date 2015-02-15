@@ -29,6 +29,7 @@ export class RideController {
         $scope.speed = 0;
         $scope.time = 0;
         $scope.currentSpeed = 0;
+        $scope.currentCadence = 0;
 
         var updateTimer: NodeJS.Timer;
 
@@ -53,6 +54,7 @@ export class RideController {
                         $scope.speed = data['Wheel']['AverageSpeed'];
                         $scope.time = data['Wheel']['Timer'];
                         $scope.currentSpeed = data['Wheel']['CurrentAverageSpeed'];
+                        $scope.currentCadence = data['Crank']['Cadence'];
                     }
                 });
             };

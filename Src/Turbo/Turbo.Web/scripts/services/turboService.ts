@@ -91,6 +91,14 @@ export class TurboService {
                             'SpeedSeries': speedSeries
                         };
                     }
+                },
+                "Crank": {
+                    GetSensor: makeCrankSensor,
+                    GetAggregators: () => {
+                        return {
+                            "Cadence": new Aggregation.RollingCadenceometer(5000)
+                        };
+                    }
                 }
             }
         };
