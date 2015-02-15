@@ -27,14 +27,13 @@
     <Content Include="content\font-awesome\fonts\fontawesome-webfont.svg" />
     <Content Include="content\style.css" />
     <Content Include="index.html" />
+    <TypeScriptCompile Include="scripts\appShim.ts" />
+    <TypeScriptCompile Include="scripts\controllers.ts" />
     <TypeScriptCompile Include="scripts\services\aggregation.ts" />
     <Content Include="scripts\angular-route.min.js" />
     <Content Include="scripts\angular.js" />
     <Content Include="scripts\angular.min.js" />
     <TypeScriptCompile Include="scripts\app.ts" />
-    <TypeScriptCompile Include="scripts\directives.ts" />
-    <TypeScriptCompile Include="scripts\homeController.ts" />
-    <TypeScriptCompile Include="scripts\rideController.ts" />
     <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
@@ -125,7 +124,7 @@
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
-    <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptTarget>ES5</TypeScriptTarget>

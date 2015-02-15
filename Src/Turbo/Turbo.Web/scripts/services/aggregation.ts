@@ -1,10 +1,7 @@
 ///<reference path="../typings/node.d.ts" />
-//import fs= require('fs');
+import fs= require('fs');
 
-module Aggregation{
-    
-    var fs = require('fs');
-    
+
     export interface Aggregator {
         Put(time : number) : void;
         Value() : any;
@@ -188,4 +185,3 @@ module Aggregation{
         Dispose() {
         }
     }
-}

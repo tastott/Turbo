@@ -1,8 +1,8 @@
 ///<reference path="../utilities.ts"/>
 ///<reference path="../typings/node.d.ts" />
+import Q = require('q')
 
-module Sensor {
-    var Q = require('q')
+//export module Sensor {
 
     export interface ISensorListener {
         subscribe(onInput: (time: number) => void);
@@ -41,7 +41,7 @@ module Sensor {
 
         stop() {
             if (this.timer) clearTimeout(this.timer);
-            return Q(null);     
+            return Q(<void>null);     
         }
         
         private randomSense(onInput : (time :number) => void){
@@ -67,19 +67,19 @@ module Sensor {
             });
             this.child.on('message', data => {
                 if (this.started) this.onInput(data);
-            }); 
+            });
         }
 
         start() {
             this.started = true;
         }
 
-        stop() : Q.Promise<void> {
+        stop(): Q.Promise<void> {
             if (this.child) {
                 this.child.kill();
             }
 
-            return Q(null);
+            return Q(<void>null);
         }
     }
 
@@ -111,4 +111,4 @@ module Sensor {
     		if(onStopped) onStopped();
     	}
 	}*/
-}
+//}
