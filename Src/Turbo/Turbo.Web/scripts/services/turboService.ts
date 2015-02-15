@@ -1,5 +1,6 @@
 ///<reference path="../typings/angular.d.ts"/>
 
+import Utilities = require('../Utilities')
 import Sensor = require('./sensor')
 import _ = require('underscore')
 var moment = require('moment');
@@ -17,7 +18,7 @@ export interface SessionContext {
 
 export interface SensorConfig {
     GetSensor: () => Sensor.ISensorListener;
-    GetAggregators(): Dictionary<Aggregation.Aggregator>;
+    GetAggregators(context : SessionContext): Dictionary<Aggregation.Aggregator>;
 }
 
 export interface TurboConfig {
@@ -40,9 +41,9 @@ class SensorSession {
     private sensor: Sensor.ISensorListener;
     private aggregators: Dictionary<Aggregation.Aggregator>;
 
-    constructor(private config: SensorConfig) {
+    constructor(private config: SensorConfig, private context : SessionContext) {
         this.sensor = config.GetSensor();
-        this.aggregators = config.GetAggregators();
+        this.aggregators = config.GetAggregators(context);
         Values(this.aggregators).forEach(agg => {
             this.sensor.subscribe(time => agg.Put(time));
         });
@@ -53,10 +54,9 @@ class SensorSession {
     }
 
     stop(): Q.Promise<void> {
-        Values(this.aggregators)
-            .map(agg => agg.Dispose)
-            .filter(dispose => !!dispose)
-            .forEach(dispose => dispose());
+        Values(this.aggregators).forEach(agg => {
+            if (agg.Dispose) agg.Dispose();
+        });
 
         return this.sensor.stop();
     }
@@ -70,19 +70,21 @@ export class TurboService {
     private _session: TurboSession;
     private config: TurboConfig;
 
-    constructor(makeWheelSensor: () => Sensor.ISensorListener, makeCrankSensor: () => Sensor.ISensorListener) {
+    constructor(makeWheelSensor: () => Sensor.ISensorListener,
+        makeCrankSensor: () => Sensor.ISensorListener,
+        private logPath : string) {
         this.config = {
             SensorConfigs: {
                 "Wheel": {
                     GetSensor: makeWheelSensor,
-                    GetAggregators: () => {
+                    GetAggregators: (context) => {
                         var counter = new Aggregation.Counter();
                         var odometer = new Aggregation.Odometer(2);
                         var timer = new Aggregation.Timer();
                         var speedo = new Aggregation.Speedometer(odometer, timer);
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
 
-                        return {
+                        var result : Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,
                             'Timer': timer,
                             'AverageSpeed': speedo,
@@ -90,22 +92,37 @@ export class TurboService {
                             'Distance': odometer,
                             'SpeedSeries': speedSeries
                         };
+
+                        if (this.logPath != undefined && this.logPath != null) {
+                            result['LogFile'] = this.MakeLogger(context, 'wheel');
+                        }
+
+                        return result;
                     }
                 },
                 "Crank": {
                     GetSensor: makeCrankSensor,
-                    GetAggregators: () => {
-                        return {
+                    GetAggregators: (context) => {
+                        var result : Dictionary<Aggregation.Aggregator> = {
                             "Cadence": new Aggregation.RollingCadenceometer(5000)
                         };
+
+                        if (this.logPath != undefined && this.logPath != null) {
+                            result['LogFile'] = this.MakeLogger(context, 'crank');
+                        }
+
+                        return result;
                     }
                 }
             }
         };
 
-        //if (this.logPath != undefined && this.logPath != null)
-        //    this.aggregators['LogFile'] = new Aggregation.LogFile(Utilities.resolve(this.logPath + '/' + id + '.log'), 100);
        
+    }
+
+    private MakeLogger(context: SessionContext, name: string) {
+        var filePath = Utilities.resolve(this.logPath + '/' + context.Id + '/' + name + '.log');
+        return new Aggregation.LogFile(filePath, 100);
     }
 
     startSession(): Q.Promise<string> {
@@ -146,8 +163,12 @@ class TurboSession {
     public sensors: Dictionary<SensorSession>;
 
     constructor(public id: string, config: TurboConfig) {
+        var context: SessionContext = {
+            Id: id
+        };
+
         this.sensors = Map(config.SensorConfigs,
-            sc => new SensorSession(sc));
+            sc => new SensorSession(sc, context));
     }
 
     start() {

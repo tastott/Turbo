@@ -29,7 +29,9 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
         var wheelSensorPin = args['wheel-sensor'];
         var crankSensorPin = args['crank-sensor'];
 
-        return new Service.TurboService(() => GetSensor(wheelSensorPin, 5), () => GetSensor(crankSensorPin, 1.5));
+        return new Service.TurboService(() => GetSensor(wheelSensorPin, 5),
+            () => GetSensor(crankSensorPin, 1.5),
+            _args['logs']);
     }])
     .controller('homeController', controllers.HomeController)
     .controller('rideController', controllers.RideController)
