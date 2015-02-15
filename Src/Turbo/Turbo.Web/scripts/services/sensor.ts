@@ -2,6 +2,8 @@
 ///<reference path="../typings/node.d.ts" />
 
 module Sensor {
+    var Q = require('q')
+
     export interface ISensorListener {
         subscribe(onInput: (time: number) => void);
         start() : void;
@@ -38,11 +40,8 @@ module Sensor {
         }
 
         stop() {
-            var deferred = Q.defer<void>();
-
             if (this.timer) clearTimeout(this.timer);
-            deferred.resolve(<void>null);
-            return deferred.promise;      
+            return Q(null);     
         }
         
         private randomSense(onInput : (time :number) => void){
@@ -80,9 +79,7 @@ module Sensor {
                 this.child.kill();
             }
 
-            var deferred = Q.defer<void>();
-            deferred.resolve(<void>null);
-            return deferred.promise;
+            return Q(null);
         }
     }
 

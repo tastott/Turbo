@@ -1,6 +1,6 @@
 ///<reference path="./typings/angular.d.ts" />
 ///<reference path="Services/turboService.ts" />
-
+///<reference path="./typings/node.d.ts" />
 module controllers {
     export class RideController {
         public static $inject = [
@@ -18,8 +18,10 @@ module controllers {
 		    $scope.time = 0;
 		    $scope.currentSpeed = 0;
 		    
+            var updateTimer : NodeJS.Timer;
+
 		    $scope.stopSession = () => {
-		        console.log('Stopping session...')
+                console.log('Stopping session...');
                 turboService.stopSession()
                     .then(id => {
                         console.log('Stopped session: ' + id);
@@ -31,17 +33,19 @@ module controllers {
                 .then(id => {
                     console.log('Started new session: ' + id);
 
-                    $scope.update = () => {
+                    var update = () => {
                         $scope.$apply(() => {
                             var data = turboService.getSessionData();
-                            $scope.distance = data['Wheel']['Distance']  / 1000;
-                            $scope.speed = data['Wheel']['AverageSpeed'];
-                            $scope.time = data['Wheel']['Timer'];
-                            $scope.currentSpeed = data['Wheel']['CurrentAverageSpeed'];
+                            if (data) {
+                                $scope.distance = data['Wheel']['Distance'] / 1000;
+                                $scope.speed = data['Wheel']['AverageSpeed'];
+                                $scope.time = data['Wheel']['Timer'];
+                                $scope.currentSpeed = data['Wheel']['CurrentAverageSpeed'];
+                            }
                         });
                     };
 
-                    setInterval($scope.update, 2000);
+                    setInterval(update, 2000);
                 });
                 
 		   

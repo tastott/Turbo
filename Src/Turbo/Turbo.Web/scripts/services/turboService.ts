@@ -7,7 +7,8 @@ module Service {
     var _ = require('underscore');
     var moment = require('moment');
     var path = require('path');
-    
+    var Q = require('q');
+
     export interface Dictionary<T> {
         [index: string]: T;
     }
@@ -32,7 +33,7 @@ module Service {
     }
 
     function Map<T,U>(dict: Dictionary<T>, func : (value : T) => U): Dictionary<U> {
-        return _.object(_.keys(dict, key => {
+        return _.object(_.keys(dict).map(key => {
             return [key, func(dict[key])];
         }));
     }
@@ -54,7 +55,11 @@ module Service {
         }
 
         stop(): Q.Promise<void> {
-            Values(this.aggregators).forEach(agg => agg.Dispose());
+            Values(this.aggregators)
+                .map(agg => agg.Dispose)
+                .filter(dispose => !!dispose)
+                .forEach(dispose => dispose());
+
             return this.sensor.stop();
         }
 
@@ -102,14 +107,14 @@ module Service {
             var start = () => {
                 var id = moment().format('YYYYMMDDHHmmss');
                 this._session = new TurboSession(id, this.config);
-
+                this._session.start();
                 return id;
             };
 
             if (this._session)
                 return this._session.stop()
                     .thenResolve(start());
-            else return Q.when(start());
+            else return Q(start());
         }
         
         stopSession() : Q.Promise<string>{
@@ -121,7 +126,7 @@ module Service {
                     return id;
                 });
             }
-            else return Q.when(<string>null);
+            else return Q(<string>null);
         }
         
         getSessionData() : Dictionary<Dictionary<any>>{
