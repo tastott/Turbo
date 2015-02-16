@@ -191,3 +191,45 @@ export class RollingTimeSeries implements Aggregator {
     Dispose() {
     }
 }
+
+export class SimpleRealLifeSpeedModel implements Aggregator {
+    private speedo: RollingSpeedometer;
+    private previousSpeed: number;
+    private previousTime: number;
+
+    constructor(private resistanceCurve: number[][],
+        private interval: number,
+        private unitDistance: number,
+        private airDensity: number,
+        private CdA: number,
+        private totalMass: number
+       ) {
+        this.speedo = new RollingSpeedometer(3000, unitDistance);
+        this.previousSpeed = 0;
+        this.previousTime = 0;
+    }
+
+    private Update() {
+        var wheelSpeed = this.speedo.Value();
+
+        var dragForce = 0.5
+            * this.airDensity
+            * this.CdA
+            * this.previousSpeed ^ 2;
+
+        var resistanceBracket = _.find(this.resistanceCurve, entry => wheelSpeed < entry[0]) || [0, 0];
+        var netForce = resistanceBracket[1] - dragForce;
+        var acceleration = netForce / this.totalMass;
+    }
+
+    Put(time: number) {
+        this.speedo.Put(time);
+
+        if (time > this.previousTime + this.interval) {
+
+        }
+    }
+
+    Value() {
+    }
+}
