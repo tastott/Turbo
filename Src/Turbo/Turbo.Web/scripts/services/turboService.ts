@@ -72,25 +72,32 @@ export class TurboService {
 
     constructor(makeWheelSensor: () => Sensor.ISensorListener,
         makeCrankSensor: () => Sensor.ISensorListener,
-        private logPath : string) {
+        private logPath: string) {
+
+        var bike = {
+            tireCircumference: 2.155
+        };
+
         this.config = {
             SensorConfigs: {
                 "Wheel": {
                     GetSensor: makeWheelSensor,
                     GetAggregators: (context) => {
                         var counter = new Aggregation.Counter();
-                        var odometer = new Aggregation.Odometer(2);
+                        var odometer = new Aggregation.Odometer(bike.tireCircumference);
                         var timer = new Aggregation.Timer();
                         var speedo = new Aggregation.Speedometer(odometer, timer);
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
+                        var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.tireCircumference, 3000);
 
                         var result : Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,
                             'Timer': timer,
                             'AverageSpeed': speedo,
-                            'CurrentAverageSpeed': new Aggregation.RollingSpeedometer(3000, 2),
+                            'CurrentAverageSpeed': new Aggregation.RollingSpeedometer(3000, bike.tireCircumference),
                             'Distance': odometer,
-                            'SpeedSeries': speedSeries
+                            'SpeedSeries': speedSeries,
+                            'RealLifeSpeed': realLifeSpeedo
                         };
 
                         if (this.logPath != undefined && this.logPath != null) {

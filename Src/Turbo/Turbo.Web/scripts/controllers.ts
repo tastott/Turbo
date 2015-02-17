@@ -55,6 +55,7 @@ export class RideController {
                         $scope.time = data['Wheel']['Timer'];
                         $scope.currentSpeed = data['Wheel']['CurrentAverageSpeed'];
                         $scope.currentCadence = data['Crank']['Cadence'];
+                        $scope.realLifeSpeed = data['Wheel']['RealLifeSpeed'];
                     }
                 });
             };
