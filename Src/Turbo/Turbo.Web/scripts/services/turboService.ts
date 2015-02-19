@@ -66,6 +66,7 @@ class SensorSession {
     }
 }
 
+
 export class TurboService {
     private _session: TurboSession;
     private config: TurboConfig;
@@ -166,7 +167,7 @@ export class TurboService {
     }
 }
 
-class TurboSession {
+export class TurboSession {
     public sensors: Dictionary<SensorSession>;
 
     constructor(public id: string, config: TurboConfig) {

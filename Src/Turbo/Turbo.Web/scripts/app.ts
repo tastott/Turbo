@@ -35,6 +35,7 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
     }])
     .controller('homeController', controllers.HomeController)
     .controller('rideController', controllers.RideController)
+    .controller('calibrateController', controllers.CalibrationController)
     //.directive('segmentDisplay', directives.SegmentDisplay)
     .config(['$routeProvider', ($routeProvider: ng.route.IRouteProvider) =>{
         $routeProvider
@@ -47,6 +48,11 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
             {
                 controller: 'homeController',
                 templateUrl: 'views/home.html'
+            })
+            .when('/calibrate',
+            {
+                controller: 'calibrateController',
+                templateUrl: 'views/calibrate.html'
             })
             .otherwise({redirectTo: '/home'});
     }]);

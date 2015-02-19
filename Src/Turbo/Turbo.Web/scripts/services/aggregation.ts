@@ -163,7 +163,9 @@ export class LogFile implements Aggregator {
         
     private Flush() {
         var data = this._buffer.map(d => '\r\n' + d).join('');
-        fs.appendFile(this.filePath, data);
+        fs.appendFile(this.filePath, data, err => {
+            if(err) console.log('Error appending to log file at "' + this.filePath + '": ' + err);
+        });
         this._buffer = [];
     }
 

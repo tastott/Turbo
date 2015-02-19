@@ -14,6 +14,21 @@ export class HomeController {
     }
 }
 
+export class CalibrationController {
+
+    constructor($scope,
+        turboService: Service.TurboService,
+        $location
+        ) {
+
+        $scope.stop = () => {
+            console.log('Exiting calibration');
+            $location.path('#/home');
+        };
+
+    }
+}
+
 export class RideController {
     public static $inject = [
         '$scope',

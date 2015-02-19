@@ -47,6 +47,7 @@
     <TypeScriptCompile Include="scripts\utilities.ts" />
     <Content Include="scripts\vendor\angular-carousel.js" />
     <Content Include="scripts\vendor\angular-touch.js" />
+    <Content Include="views\calibrate.html" />
     <Content Include="views\home.html" />
     <Content Include="views\ride.html" />
     <Content Include="web.config" />
