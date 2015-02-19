@@ -34,6 +34,7 @@
     <Content Include="scripts\angular.js" />
     <Content Include="scripts\angular.min.js" />
     <TypeScriptCompile Include="scripts\app.ts" />
+    <TypeScriptCompile Include="scripts\services\calibrator.ts" />
     <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
