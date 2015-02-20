@@ -1,5 +1,8 @@
 ﻿///<reference path="./typings/angular.d.ts" />
 import Service = require('./services/turboService')
+import calib = require('./services/calibrator')
+import m = require('./models/metric')
+
 var nwgui = (<any>window).require('nw.gui');
 
 export class HomeController {
@@ -16,16 +19,27 @@ export class HomeController {
 
 export class CalibrationController {
 
-    constructor($scope,
-        turboService: Service.TurboService,
-        $location
-        ) {
+    constructor(private $scope, private $location : ng.ILocationService) {
 
-        $scope.stop = () => {
-            console.log('Exiting calibration');
-            $location.path('#/home');
-        };
+        var calibrator = new calib.Calibrator(this.onCalibrationEvent);
 
+
+        $scope.stop = this.stop;
+    }
+
+    stop = () => {
+        console.log('Exiting calibration');
+        this.$location.path('#/home');
+    }
+
+    private onCalibrationEvent(event: calib.CalibrationEvent) {
+        switch (event.Type) {
+            case calib.EventType.PreCaptureStarted:
+                var minSpeed: m.Metric = event.Data.MinSpeed;
+                this.$scope.message = 'Accelerate to greater than ' + minSpeed + ' rpm, then stop pedalling.';
+            case calib.EventType.CaptureStarted:
+
+        }
     }
 }
 

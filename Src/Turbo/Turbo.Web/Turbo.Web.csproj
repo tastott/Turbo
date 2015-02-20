@@ -29,6 +29,7 @@
     <Content Include="index.html" />
     <TypeScriptCompile Include="scripts\appShim.ts" />
     <TypeScriptCompile Include="scripts\controllers.ts" />
+    <TypeScriptCompile Include="scripts\models\metric.ts" />
     <TypeScriptCompile Include="scripts\services\aggregation.ts" />
     <Content Include="scripts\angular-route.min.js" />
     <Content Include="scripts\angular.js" />
