@@ -21,7 +21,8 @@ export class CalibrationController {
 
     constructor(private $scope, private $location : ng.ILocationService) {
 
-        var calibrator = new calib.Calibrator(this.onCalibrationEvent);
+        var dummyData = require('./services/data/wheel-stops');
+        calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
 
 
         $scope.stop = this.stop;

@@ -29,3 +29,6 @@
 /Src/Turbo/Turbo.Web/scripts/appShim.js
 /Src/Turbo/Turbo.Web/scripts/services/calibrator.js
 /Src/Turbo/Turbo.Web/scripts/models/metric.js
+/Src/Turbo/Turbo.Analysis/obj
+/Src/Turbo/Turbo.Analysis/scripts/app.js
+/Src/Turbo/Turbo.Analysis/scripts/app.js.map

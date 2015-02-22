@@ -1,7 +1,8 @@
 ﻿export enum Unit {
     Kilometres,
     Hours,
-    Milliseconds
+    Milliseconds,
+    RevolutionsPerSecond
 }
 
 export interface Metric {

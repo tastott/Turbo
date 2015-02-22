@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbo.Web", "Turbo.Web\Turbo.Web.csproj", "{004F8130-03E2-4939-8977-922C2B43ABE6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{BE86037E-057D-41DB-ADDE-671EC904ABEF}"
@@ -9,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{BE8603
 		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
 		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Turbo.Analysis", "Turbo.Analysis\Turbo.Analysis.csproj", "{0D1B3995-9863-4A74-ABE9-9EEA76C695CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +24,10 @@ Global
 		{004F8130-03E2-4939-8977-922C2B43ABE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{004F8130-03E2-4939-8977-922C2B43ABE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{004F8130-03E2-4939-8977-922C2B43ABE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D1B3995-9863-4A74-ABE9-9EEA76C695CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D1B3995-9863-4A74-ABE9-9EEA76C695CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D1B3995-9863-4A74-ABE9-9EEA76C695CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D1B3995-9863-4A74-ABE9-9EEA76C695CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
