@@ -1,6 +1,9 @@
 ﻿import Q = require('q')
 import ts = require('turboService')
 import m = require('../models/metric')
+import _ = require('underscore')
+var stats = require('simple-statistics')
+
 
 export enum EventType {
     PreCaptureStarted,
@@ -37,7 +40,7 @@ class CaptureSession {
     }
 }
 
-export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]) {
+export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): { Speed: number; Power: number }[] {
     var stops = GetCrankPauses(crankData)
         .map(pause => {
             return {
@@ -46,11 +49,34 @@ export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: numbe
             };
         });
 
-    stops.forEach(stop => {
-        var speedSegs = TimesToRps(stop.WheelData);
-        var energySegs = ToEnergySegments(speedSegs);
-        var powerSegs = ToPowerSegments(energySegs);
-    });
+    var powerVsSpeed =
+        _.flatten(
+            stops.map(stop => {
+                var speedSegs = TimesToRps(stop.WheelData);
+                var energySegs = ToEnergySegments(speedSegs);
+                var powerSegs = ToPowerSegments(energySegs);
+                return powerSegs.map(ps => {
+                    var speed = (ps.To.Rps + ps.From.Rps) / 2;
+                    return {
+                        Speed: speed,
+                        Power: ps.Power
+                    };
+                });
+            })
+        );
+
+    
+    var pvsLogs = powerVsSpeed
+        .filter(pvs => Math.abs(pvs.Power) < 1000)
+        .map(pvs => [Math.log(pvs.Speed), Math.log(pvs.Power)]);
+
+    var logReg = stats
+        .linear_regression()
+        .data(pvsLogs);
+
+    
+
+    return powerVsSpeed;
 }
 
 interface Range<T> {

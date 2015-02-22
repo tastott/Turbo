@@ -22,8 +22,13 @@ export class CalibrationController {
     constructor(private $scope, private $location : ng.ILocationService) {
 
         var dummyData = require('./services/data/wheel-stops');
-        calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
+        var fs = require('fs');
+        var powerVsSpeed = calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
+        var powerVsSpeedCsv = powerVsSpeed
+            .map(pvs => pvs.Speed + ',' + pvs.Power)
+            .join('\n');
 
+        //fs.writeFile('C:\\users\\tim\\desktop\\power-vs-speed.csv', powerVsSpeedCsv);
 
         $scope.stop = this.stop;
     }
