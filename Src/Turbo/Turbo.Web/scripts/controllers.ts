@@ -23,10 +23,15 @@ export class CalibrationController {
 
         var dummyData = require('./services/data/wheel-stops');
         var fs = require('fs');
-        var powerVsSpeed = calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
-        var powerVsSpeedCsv = powerVsSpeed
-            .map(pvs => pvs.Speed + ',' + pvs.Power)
-            .join('\n');
+        var powerCurveResult = calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
+        if (powerCurveResult.ErrorMessage) console.log("Failed to get power curve: " + powerCurveResult.ErrorMessage);
+        else {
+            console.log("Power curve: " + JSON.stringify(powerCurveResult.Curve, null, 4));
+        }
+
+        //var powerVsSpeedCsv = powerVsSpeed
+        //    .map(pvs => pvs.Speed + ',' + pvs.Power)
+        //    .join('\n');
 
         //fs.writeFile('C:\\users\\tim\\desktop\\power-vs-speed.csv', powerVsSpeedCsv);
 

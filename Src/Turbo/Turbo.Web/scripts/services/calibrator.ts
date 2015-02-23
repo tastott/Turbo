@@ -40,7 +40,20 @@ class CaptureSession {
     }
 }
 
-export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): { Speed: number; Power: number }[] {
+export interface PowerCurve {
+    Coefficient: number;
+    Exponent: number;
+    Fit: number;
+}
+
+export interface PowerCurveResult {
+    ErrorMessage?: string;
+    Curve?: PowerCurve;
+    Data?: { Speed: number; Power: number }[];
+    IgnoredData?: { Speed: number; Power: number }[];  
+}
+
+export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): PowerCurveResult {
     var stops = GetCrankPauses(crankData)
         .map(pause => {
             return {
@@ -65,18 +78,52 @@ export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: numbe
             })
         );
 
-    
-    var pvsLogs = powerVsSpeed
-        .filter(pvs => Math.abs(pvs.Power) < 1000)
-        .map(pvs => [Math.log(pvs.Speed), Math.log(pvs.Power)]);
+    if (!powerVsSpeed.length) return { ErrorMessage: "No pedalling pauses found" };
 
+    //Filter out some values that are a bit crazy or will break the regression
+    var filtered = _.partition(powerVsSpeed, pvs => Math.abs(pvs.Power) < 1000 && pvs.Power > 0 && pvs.Speed > 0);
+    if (!filtered[0].length)
+        return {
+            ErrorMessage: "No useable data found",
+            IgnoredData: filtered[1]
+        };
+
+    var curve = DoPowerRegression(filtered[0].map(pvs => [pvs.Speed, pvs.Power]));
+
+    if (!curve)
+        return {
+            ErrorMessage: "Power regression for data failed",
+            Data: filtered[0],
+            IgnoredData: filtered[1]
+        };
+
+    return {
+        Curve: curve,
+        Data: filtered[0],
+        IgnoredData: filtered[1]
+    };
+            
+}
+
+function DoPowerRegression(data: number[][]): PowerCurve {
+
+    var logData = data.map(d => [Math.log(d[0]), Math.log(d[1])]);
     var logReg = stats
         .linear_regression()
-        .data(pvsLogs);
+        .data(logData);
 
-    
+    if (logReg.m() == undefined || logReg.b() == undefined) return null;
+    else {
+        var coefficient = Math.exp(logReg.b());
+        var exponent = logReg.m();
+        var fit = stats.r_squared(data, x => coefficient * Math.pow(x, exponent));
 
-    return powerVsSpeed;
+        return {
+            Coefficient:coefficient,
+            Exponent: exponent,
+            Fit: fit
+        };
+    }
 }
 
 interface Range<T> {
