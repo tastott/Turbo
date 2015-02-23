@@ -2,6 +2,8 @@
 import Service = require('./services/turboService')
 import calib = require('./services/calibrator')
 import m = require('./models/metric')
+import $ = require('jquery')
+import d3 = require('d3')
 
 var nwgui = (<any>window).require('nw.gui');
 
@@ -27,6 +29,7 @@ export class CalibrationController {
         if (powerCurveResult.ErrorMessage) console.log("Failed to get power curve: " + powerCurveResult.ErrorMessage);
         else {
             console.log("Power curve: " + JSON.stringify(powerCurveResult.Curve, null, 4));
+            this.chartPowerCurve(powerCurveResult);
         }
 
         //var powerVsSpeedCsv = powerVsSpeed
@@ -36,6 +39,22 @@ export class CalibrationController {
         //fs.writeFile('C:\\users\\tim\\desktop\\power-vs-speed.csv', powerVsSpeedCsv);
 
         $scope.stop = this.stop;
+    }
+
+    chartPowerCurve(curveResult: calib.PowerCurveResult) {
+
+        var svg = d3.select('body')
+            .append('svg')
+            .attr('width', 300)
+            .attr('height', 200);
+
+        var xScale = d3.scale.linear().range([0, 300]);
+        var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+        var yScale = d3.scale.linear().range([0, 200]);
+        var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+        
     }
 
     stop = () => {

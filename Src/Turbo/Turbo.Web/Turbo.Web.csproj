@@ -38,6 +38,7 @@
     <TypeScriptCompile Include="scripts\services\calibrator.ts" />
     <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\d3\d3.d.ts" />
     <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\services\sensor.ts" />
     <TypeScriptCompile Include="scripts\services\turboService.ts" />
