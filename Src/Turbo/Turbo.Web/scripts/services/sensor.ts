@@ -32,6 +32,41 @@ import Q = require('q')
         }
     }
     
+    export class PlaybackSensorListener extends BaseSensorListener implements ISensorListener {
+        private timer: NodeJS.Timer;
+        private offset: number;
+
+        constructor(private data: number[]) {
+            super();
+
+
+        }
+
+        private doNext() {
+            if (this.data.length) {
+                var nextTime = this.data.shift() + this.offset;
+                var delay = Math.max(0, nextTime - new Date().getTime());
+                this.timer = setTimeout(() => {
+                    this.onInput(nextTime);
+                    this.doNext();
+                }, delay);
+            }
+        }
+
+        start() {
+            this.offset = new Date().getTime() - this.data[0];
+            this.doNext();
+        }
+
+        stop() {
+            if (this.timer) {
+                clearTimeout(this.timer);
+                this.timer = null;
+            }
+            return Q(<void>null);
+        }
+    }
+
     export class FakeSensorListener extends BaseSensorListener implements ISensorListener {
         private timer: NodeJS.Timer;
 

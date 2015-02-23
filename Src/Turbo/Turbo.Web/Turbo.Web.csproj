@@ -29,6 +29,7 @@
     <Content Include="index.html" />
     <TypeScriptCompile Include="scripts\appShim.ts" />
     <TypeScriptCompile Include="scripts\controllers.ts" />
+    <TypeScriptCompile Include="scripts\models\dictionary.ts" />
     <TypeScriptCompile Include="scripts\models\metric.ts" />
     <TypeScriptCompile Include="scripts\services\aggregation.ts" />
     <Content Include="scripts\angular-route.min.js" />
@@ -97,7 +98,9 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="scripts\typings\lodash\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

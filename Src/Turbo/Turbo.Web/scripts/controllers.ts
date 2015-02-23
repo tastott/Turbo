@@ -2,8 +2,9 @@
 import Service = require('./services/turboService')
 import calib = require('./services/calibrator')
 import m = require('./models/metric')
-import $ = require('jquery')
-import d3 = require('d3')
+import sensor = require('./services/sensor')
+
+//import d3 = require('d3')
 
 var nwgui = (<any>window).require('nw.gui');
 
@@ -20,46 +21,48 @@ export class HomeController {
 }
 
 export class CalibrationController {
+    private activeCapture: calib.PowerCurveCapture;
 
     constructor(private $scope, private $location : ng.ILocationService) {
 
-        var dummyData = require('./services/data/wheel-stops');
-        var fs = require('fs');
-        var powerCurveResult = calib.GetPowerCurveFromWheelStop(dummyData.wheelData, dummyData.crankData);
-        if (powerCurveResult.ErrorMessage) console.log("Failed to get power curve: " + powerCurveResult.ErrorMessage);
-        else {
-            console.log("Power curve: " + JSON.stringify(powerCurveResult.Curve, null, 4));
-            this.chartPowerCurve(powerCurveResult);
-        }
+       
 
-        //var powerVsSpeedCsv = powerVsSpeed
-        //    .map(pvs => pvs.Speed + ',' + pvs.Power)
-        //    .join('\n');
-
-        //fs.writeFile('C:\\users\\tim\\desktop\\power-vs-speed.csv', powerVsSpeedCsv);
-
+        $scope.start = this.start;
         $scope.stop = this.stop;
     }
 
-    chartPowerCurve(curveResult: calib.PowerCurveResult) {
+    start = () => {
+        var dummyData = require('./services/data/wheel-stops');
 
-        var svg = d3.select('body')
-            .append('svg')
-            .attr('width', 300)
-            .attr('height', 200);
+        this.activeCapture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
+            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
 
-        var xScale = d3.scale.linear().range([0, 300]);
-        var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+        this.activeCapture.Capture()
+            .then(result => {
+            console.log(result);
+        });
+    }
 
-        var yScale = d3.scale.linear().range([0, 200]);
-        var yAxis = d3.svg.axis().scale(yScale).orient("left");
+    //chartPowerCurve(curveResult: calib.PowerCurveResult) {
+
+    //    var svg = d3.select('body')
+    //        .append('svg')
+    //        .attr('width', 300)
+    //        .attr('height', 200);
+
+    //    var xScale = d3.scale.linear().range([0, 300]);
+    //    var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+    //    var yScale = d3.scale.linear().range([0, 200]);
+    //    var yAxis = d3.svg.axis().scale(yScale).orient("left");
 
         
-    }
+    //}
 
     stop = () => {
         console.log('Exiting calibration');
-        this.$location.path('#/home');
+        (this.activeCapture ? this.activeCapture.Stop() : Q(<void>null))
+            .then(() => this.$location.path('#/home'));
     }
 
     private onCalibrationEvent(event: calib.CalibrationEvent) {

@@ -7,10 +7,8 @@ var moment = require('moment');
 var path = require('path');
 import Q = require('q');
 import Aggregation = require('./aggregation')
+import d = require('../models/dictionary')
 
-export interface Dictionary<T> {
-    [index: string]: T;
-}
 
 export interface SessionContext {
     Id: string;
@@ -18,7 +16,7 @@ export interface SessionContext {
 
 export interface SensorConfig {
     GetSensor: () => Sensor.ISensorListener;
-    GetAggregators(context : SessionContext): Dictionary<Aggregation.Aggregator>;
+    GetAggregators(context : SessionContext): d.Dictionary<Aggregation.Aggregator>;
 }
 
 export interface TurboConfig {
@@ -27,24 +25,16 @@ export interface TurboConfig {
     }
 }
 
-function Values<T>(dict: Dictionary<T>): T[] {
-    return _.values(dict);
-}
 
-function Map<T, U>(dict: Dictionary<T>, func: (value: T) => U): Dictionary<U> {
-    return <any>_.object(_.keys(dict).map(key => {
-        return [key, func(dict[key])];
-    }));
-}
 
 class SensorSession {
     private sensor: Sensor.ISensorListener;
-    private aggregators: Dictionary<Aggregation.Aggregator>;
+    private aggregators: d.Dictionary<Aggregation.Aggregator>;
 
     constructor(private config: SensorConfig, private context : SessionContext) {
         this.sensor = config.GetSensor();
         this.aggregators = config.GetAggregators(context);
-        Values(this.aggregators).forEach(agg => {
+        d.Values(this.aggregators).forEach(agg => {
             this.sensor.subscribe(time => agg.Put(time));
         });
     }
@@ -54,15 +44,15 @@ class SensorSession {
     }
 
     stop(): Q.Promise<void> {
-        Values(this.aggregators).forEach(agg => {
+        d.Values(this.aggregators).forEach(agg => {
             if (agg.Dispose) agg.Dispose();
         });
 
         return this.sensor.stop();
     }
 
-    getData(): Dictionary<any> {
-        return Map(this.aggregators, a => a.Value());
+    getData(): d.Dictionary<any> {
+        return d.Map(this.aggregators, a => a.Value());
     }
 }
 
@@ -91,7 +81,7 @@ export class TurboService {
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
                         var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.tireCircumference, 3000);
 
-                        var result : Dictionary<Aggregation.Aggregator> = {
+                        var result : d.Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,
                             'Timer': timer,
                             'AverageSpeed': speedo,
@@ -111,7 +101,7 @@ export class TurboService {
                 "Crank": {
                     GetSensor: makeCrankSensor,
                     GetAggregators: (context) => {
-                        var result : Dictionary<Aggregation.Aggregator> = {
+                        var result : d.Dictionary<Aggregation.Aggregator> = {
                             "Cadence": new Aggregation.RollingCadenceometer(5000)
                         };
 
@@ -138,12 +128,12 @@ export class TurboService {
         var start = () => {
             var id = moment().format('YYYYMMDDHHmmss');
             this._session = new TurboSession(id, this.config);
-            this._session.start();
+            this._session.Start();
             return id;
         };
 
         if (this._session)
-            return this._session.stop()
+            return this._session.Stop()
                 .thenResolve(start());
         else return Q(start());
     }
@@ -151,7 +141,7 @@ export class TurboService {
     stopSession(): Q.Promise<string> {
         if (this._session) {
             var id = this._session.id;
-            return this._session.stop()
+            return this._session.Stop()
                 .then(() => {
                 this._session = null;
                 return id;
@@ -160,32 +150,35 @@ export class TurboService {
         else return Q(<string>null);
     }
 
-    getSessionData(): Dictionary<Dictionary<any>> {
-        if (this._session) {
-            return Map(this._session.sensors, sensor => sensor.getData());
-        } else return null;
+    getSessionData(): d.Dictionary<d.Dictionary<any>> {
+        if (this._session) return this._session.GetData();
+        else return null;
     }
 }
 
 export class TurboSession {
-    public sensors: Dictionary<SensorSession>;
+    private sensors: d.Dictionary<SensorSession>;
 
     constructor(public id: string, config: TurboConfig) {
         var context: SessionContext = {
             Id: id
         };
 
-        this.sensors = Map(config.SensorConfigs,
+        this.sensors = d.Map(config.SensorConfigs,
             sc => new SensorSession(sc, context));
     }
 
-    start() {
-        Values(this.sensors).forEach(s => s.start());
+    Start() {
+        d.Values(this.sensors).forEach(s => s.start());
     }
 
-    stop(): Q.Promise<void> {
-        return Q.all(Values(this.sensors).map(s => s.stop()))
+    Stop(): Q.Promise<void> {
+        return Q.all(d.Values(this.sensors).map(s => s.stop()))
             .thenResolve(<void>null);
+    }
+
+    GetData(): d.Dictionary<d.Dictionary<any>> {
+        return d.Map(this.sensors, sensor => sensor.getData());
     }
 }
 //}

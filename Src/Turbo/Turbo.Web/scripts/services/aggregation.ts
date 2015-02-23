@@ -8,6 +8,23 @@ export interface Aggregator {
     Dispose?: () => void;
 }
 
+export class DataCollector implements Aggregator {
+    private data: number[];
+
+    constructor(private maxDataSize: number) {
+        this.data = [];
+    }
+
+    Put(time: number) {
+        this.data.push(time);
+        while (this.data.length > this.maxDataSize) this.data.shift();
+    }
+
+    Value() {
+        return this.data;
+    }
+}
+
 export class Counter implements Aggregator {
     private _count: number;
 

@@ -1,9 +1,11 @@
 ﻿import Q = require('q')
-import ts = require('turboService')
+import ts = require('./turboService')
 import m = require('../models/metric')
+import sensor = require('./sensor')
+import agg = require('./aggregation')
 import _ = require('underscore')
+import d = require('../models/dictionary')
 var stats = require('simple-statistics')
-
 
 export enum EventType {
     PreCaptureStarted,
@@ -16,29 +18,6 @@ export interface CalibrationEvent {
     Data?: any;
 }
 
-export class Calibrator {
-    constructor(private onEvent: (event: CalibrationEvent) => void) {
-    }
-
-    start() {
-    }
-
-    stop() {
-    }
-
-    getMetrics(): m.Metric[]{
-        return [];
-    }
-} 
-
-class CaptureSession {
-    start(): Q.Promise<string> {
-
-
-        return Q('test');
-
-    }
-}
 
 export interface PowerCurve {
     Coefficient: number;
@@ -53,7 +32,107 @@ export interface PowerCurveResult {
     IgnoredData?: { Speed: number; Power: number }[];  
 }
 
-export function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): PowerCurveResult {
+export class PowerCurveCapture {
+    private deferred: Q.Deferred<d.Dictionary<d.Dictionary<any>>>;
+    private turboSession: ts.TurboSession;
+    private checkSession: NodeJS.Timer;
+    private checkInterval: number;
+    private minInitialWheelRps: number;
+
+    constructor(private makeWheelSensor: () => sensor.ISensorListener,
+        private makeCrankSensor: () => sensor.ISensorListener) {
+        this.checkInterval = 1000;
+        this.minInitialWheelRps = 5;
+    }
+
+    Capture(): Q.Promise<PowerCurveResult> {
+        return this.CaptureData()
+            .then(data => {
+                return GetPowerCurveFromWheelStop(data['Wheel']['Data'], data['Crank']['Data']);
+            });
+    }
+
+    private CaptureData(): Q.Promise<d.Dictionary<d.Dictionary<any>>> {
+
+        if (this.deferred && this.deferred.promise.inspect().state == 'pending') {
+            this.deferred.reject('New capture started');
+            this.deferred = null;
+        }
+
+        this.deferred = Q.defer<d.Dictionary<d.Dictionary<any>>>();
+
+        this.Stop()
+            .then(() => {
+            this.turboSession = new ts.TurboSession(new Date().getTime().toString(), this.GetTurboConfig());
+            this.checkSession = setInterval(() => {
+              
+                if (this.SessionIsComplete(this.turboSession)) {
+                    if (this.deferred) {
+                        this.Stop().
+                            then(() => this.deferred.resolve(this.turboSession.GetData()));
+                    }
+                }
+                else {
+                    console.log('Session length: ' + this.turboSession.GetData()['Wheel']['Data'].length);
+                }
+            }, this.checkInterval);
+            this.turboSession.Start();
+
+        });
+
+        return this.deferred.promise;
+    }
+
+    private SessionIsComplete(session: ts.TurboSession): boolean {
+
+        var data = session.GetData();
+        var crankPauses = GetCrankPauses(data['Crank']['Data']);
+
+        return !!_.chain(crankPauses)
+            .map(pause => GetTimesInRange(data['Wheel']['Data'], pause))
+            .filter(wheelData => wheelData.length > 2
+                && TimesToRps(wheelData)[0].Rps > this.minInitialWheelRps)
+            .value()
+            .length;
+
+    }
+    
+    Stop(): Q.Promise<void> {
+
+
+        if (this.checkSession) {
+            clearInterval(this.checkSession);
+            this.checkSession = null;
+        }
+
+        return this.turboSession ? this.turboSession.Stop() : Q(<void>null);
+    }
+
+    private GetTurboConfig(): ts.TurboConfig {
+        return {
+            SensorConfigs: {
+                "Wheel": {
+                    GetSensor: this.makeWheelSensor,
+                    GetAggregators: context => {
+                        return {
+                            "Data": new agg.DataCollector(10000)
+                        };
+                    }
+                },
+                "Crank": {
+                    GetSensor: this.makeCrankSensor,
+                    GetAggregators: context => {
+                        return {
+                            "Data": new agg.DataCollector(10000)
+                        };
+                    }
+                }
+            }
+        };
+    }
+}
+
+function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): PowerCurveResult {
     var stops = GetCrankPauses(crankData)
         .map(pause => {
             return {
@@ -164,17 +243,22 @@ function ToEnergySegments(wheelSpeedSegments: RpsSegment[]) : EnergySegment[] {
 }
 
 function GetTimesInRange(times: number[], range : Range<number>) {
-    return times.filter(t => t >= range.From && t <= range.To);
+    return times.filter(t => t >= range.From && (range.To == null || t <= range.To));
 }
 
 function GetCrankPauses(crankData: number[]): Range<number>[]{
 
-    var pauses: Range<number>[] = [];
-    var minPauseLength = 3;
+    if (crankData.length < 1) return [];
 
-    var speedSegments = TimesToRps(crankData);
+    var minPauseLength = 5;
 
-    return speedSegments.filter(s => s.Rps < (1 / minPauseLength));
+    var now = new Date().getTime();
+
+    var crankDataPlusNow = crankData.concat([new Date().getTime()])
+
+    return TimesToRps(crankDataPlusNow)
+        .filter(s => s.Rps < (1 / minPauseLength));
+
 }
 
 interface PowerSegment extends Range<EnergySegment> {
