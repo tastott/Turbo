@@ -7,6 +7,7 @@ import sensor = require('./services/sensor')
 //import d3 = require('d3')
 
 var nwgui = (<any>window).require('nw.gui');
+var dummyData = require('./services/data/wheel-stops');
 
 export class HomeController {
     public static $inject = [
@@ -32,15 +33,23 @@ export class CalibrationController {
     }
 
     start = () => {
-        var dummyData = require('./services/data/wheel-stops');
-
-        this.activeCapture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
-            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
+        
+        
 
         this.activeCapture.Capture()
             .then(result => {
             console.log(result);
         });
+    }
+
+    private CapturePowerCurve(index: number): Q.Promise<calib.PowerCurveResult>{
+        this.activeCapture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
+            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
+
+        return this.activeCapture.Capture()
+            .fail(() => {
+                return this.CapturePowerCurve(index); //Just do it again!
+            });
     }
 
     //chartPowerCurve(curveResult: calib.PowerCurveResult) {
