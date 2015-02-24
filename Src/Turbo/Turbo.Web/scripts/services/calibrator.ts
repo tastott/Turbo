@@ -1,6 +1,6 @@
 ﻿import Q = require('q')
 import ts = require('./turboService')
-import m = require('../models/metric')
+import m = require('../models/models')
 import sensor = require('./sensor')
 import agg = require('./aggregation')
 import _ = require('underscore')
@@ -19,15 +19,11 @@ export interface CalibrationEvent {
 }
 
 
-export interface PowerCurve {
-    Coefficient: number;
-    Exponent: number;
-    Fit: number;
-}
+
 
 export interface PowerCurveResult {
     ErrorMessage?: string;
-    Curve?: PowerCurve;
+    Curve?: m.PowerCurve;
     Data?: { Speed: number; Power: number }[];
     IgnoredData?: { Speed: number; Power: number }[];  
 }
@@ -184,7 +180,7 @@ function GetPowerCurveFromWheelStop(wheelData: number[], crankData: number[]): P
             
 }
 
-function DoPowerRegression(data: number[][]): PowerCurve {
+function DoPowerRegression(data: number[][]): m.PowerCurve {
 
     var logData = data.map(d => [Math.log(d[0]), Math.log(d[1])]);
     var logReg = stats

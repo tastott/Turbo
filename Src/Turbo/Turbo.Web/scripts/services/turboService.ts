@@ -8,7 +8,9 @@ var path = require('path');
 import Q = require('q');
 import Aggregation = require('./aggregation')
 import d = require('../models/dictionary')
+import m = require('../models/models')
 
+var powerCurve : m.PowerCurve = require('../../data/power.json')
 
 export interface SessionContext {
     Id: string;
@@ -81,14 +83,15 @@ export class TurboService {
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
                         var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.tireCircumference, 3000);
 
-                        var result : d.Dictionary<Aggregation.Aggregator> = {
+                        var result: d.Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,
                             'Timer': timer,
                             'AverageSpeed': speedo,
                             'CurrentAverageSpeed': new Aggregation.RollingSpeedometer(3000, bike.tireCircumference),
                             'Distance': odometer,
                             'SpeedSeries': speedSeries,
-                            'RealLifeSpeed': realLifeSpeedo
+                            'RealLifeSpeed': realLifeSpeedo,
+                            'CurrentPower': new Aggregation.RollingPowermeter(3000, powerCurve)
                         };
 
                         if (this.logPath != undefined && this.logPath != null) {

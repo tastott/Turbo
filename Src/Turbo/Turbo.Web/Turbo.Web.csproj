@@ -31,6 +31,7 @@
     <TypeScriptCompile Include="scripts\controllers.ts" />
     <TypeScriptCompile Include="scripts\models\dictionary.ts" />
     <TypeScriptCompile Include="scripts\models\metric.ts" />
+    <TypeScriptCompile Include="scripts\models\models.ts" />
     <TypeScriptCompile Include="scripts\services\aggregation.ts" />
     <Content Include="scripts\angular-route.min.js" />
     <Content Include="scripts\angular.js" />
@@ -91,6 +92,9 @@
     <Content Include="scripts\services\test.py" />
     <Content Include="packages.config" />
     <Content Include="package.json" />
+    <Content Include="data\power.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

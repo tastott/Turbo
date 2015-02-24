@@ -1,6 +1,7 @@
 ///<reference path="../typings/node.d.ts" />
 import fs = require('fs');
 import path = require('path')
+import m = require('../models/models')
 
 export interface Aggregator {
     Put(time: number): void;
@@ -160,6 +161,22 @@ export class RollingCadenceometer extends RollingAggregator {
 
             if (!minutes) return 0;
             else return times.length / minutes;
+        });
+    }
+}
+
+export class RollingPowermeter extends RollingAggregator {
+
+    constructor(windowLength: number, powerCurve : m.PowerCurve) {
+        super(windowLength,(times: number[]) => {
+            var now = new Date().getTime();
+            var seconds = (now - times[0]) / 1000;
+            if (!seconds) return 0;
+            else {
+                var rps = times.length / seconds;
+                var power = powerCurve.Coefficient * Math.pow(rps, powerCurve.Exponent);
+                return power;
+            }
         });
     }
 }
