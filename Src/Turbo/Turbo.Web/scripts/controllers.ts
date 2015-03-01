@@ -1,4 +1,5 @@
-﻿///<reference path="./typings/angular.d.ts" />
+﻿///<reference path="./typings/angularjs/angular.d.ts" />
+///<reference path="./typings/angular-ui-bootstrap/angular-ui-bootstrap.d.ts"/>
 import Service = require('./services/turboService')
 import calib = require('./services/calibrator')
 import m = require('./models/metric')
@@ -8,6 +9,13 @@ import sensor = require('./services/sensor')
 
 var nwgui = (<any>window).require('nw.gui');
 var dummyData = require('./services/data/wheel-stops');
+
+export var Names = {
+    Home: 'homeController',
+    Ride: 'rideController',
+    Calibrate: 'calibrateController',
+    CalibrationCapture: 'calibrationCaptureController'
+};
 
 export class HomeController {
     public static $inject = [
@@ -22,11 +30,10 @@ export class HomeController {
 }
 
 export class CalibrationController {
-    private activeCapture: calib.PowerCurveCapture;
 
-    constructor(private $scope, private $location : ng.ILocationService) {
-
-       
+    constructor(private $scope,
+        private $location: ng.ILocationService,
+        private $modal : ng.ui.bootstrap.IModalService) {
 
         $scope.start = this.start;
         $scope.stop = this.stop;
@@ -36,20 +43,21 @@ export class CalibrationController {
         
         
 
-        this.activeCapture.Capture()
-            .then(result => {
-            console.log(result);
-        });
+        this.CapturePowerCurve(0);
     }
 
-    private CapturePowerCurve(index: number): Q.Promise<calib.PowerCurveResult>{
-        this.activeCapture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
-            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
+    private CapturePowerCurve(index: number) { //: Q.Promise<calib.PowerCurveResult>{
 
-        return this.activeCapture.Capture()
-            .fail(() => {
-                return this.CapturePowerCurve(index); //Just do it again!
+        var modal = this.$modal.open({
+            controller: Names.CalibrationCapture,
+            templateUrl: 'views/modals/calibration-capture.html'
+        });
+
+        modal.result
+            .then(result => {
+                console.log(result);
             });
+        
     }
 
     //chartPowerCurve(curveResult: calib.PowerCurveResult) {
@@ -70,18 +78,37 @@ export class CalibrationController {
 
     stop = () => {
         console.log('Exiting calibration');
-        (this.activeCapture ? this.activeCapture.Stop() : Q(<void>null))
-            .then(() => this.$location.path('#/home'));
+        this.$location.path('#/home');
     }
 
-    private onCalibrationEvent(event: calib.CalibrationEvent) {
-        switch (event.Type) {
-            case calib.EventType.PreCaptureStarted:
-                var minSpeed: m.Metric = event.Data.MinSpeed;
-                this.$scope.message = 'Accelerate to greater than ' + minSpeed + ' rpm, then stop pedalling.';
-            case calib.EventType.CaptureStarted:
+}
 
-        }
+export class CalibrationCaptureController {
+    private capture: calib.PowerCurveCapture;
+
+    constructor(private $scope,
+        private $modalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+        $scope.Ok = this.Ok;
+        $scope.Cancel = this.Cancel;
+
+
+        return;
+        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
+            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
+
+        this.capture.Capture()
+            .then(curve => $modalInstance.close(curve))
+            .fail(() => {
+            $modalInstance.dismiss('Capture failed');
+        });           
+    }
+
+    Ok = () => {
+        this.$modalInstance.close('ok');
+    }
+
+    Cancel = () => {
+        this.$modalInstance.dismiss('cancel');
     }
 }
 

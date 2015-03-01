@@ -1,5 +1,5 @@
-///<reference path="./typings/angular.d.ts" />
-///<reference path="./typings/angular-route.d.ts" />
+///<reference path="./typings/angularjs/angular.d.ts" />
+///<reference path="./typings/angularjs/angular-route.d.ts" />
 
 import Args = require('./args')
 import Sensor = require('./services/sensor')
@@ -23,7 +23,7 @@ function GetSensor(pin, fakeFrequency :number) : Sensor.ISensorListener{
 }
 
 var wAngular: ng.IAngularStatic = (<any>window).angular; //Dirty workaround because statically-loaded scripts aren't available as global variables in this context
-wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
+wAngular.module('turboApp', ['ngRoute', 'angular-carousel', 'ui.bootstrap'])
     .service('args', () => _args)
     .service('turboService', ['args', args => {
         var wheelSensorPin = args['wheel-sensor'];
@@ -33,25 +33,26 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel'])
             () => GetSensor(crankSensorPin, 1.5),
             _args['logs']);
     }])
-    .controller('homeController', controllers.HomeController)
-    .controller('rideController', controllers.RideController)
-    .controller('calibrateController', controllers.CalibrationController)
+    .controller(controllers.Names.Home, controllers.HomeController)
+    .controller(controllers.Names.Ride, controllers.RideController)
+    .controller(controllers.Names.Calibrate, controllers.CalibrationController)
+    .controller(controllers.Names.CalibrationCapture, controllers.CalibrationCaptureController)
     //.directive('segmentDisplay', directives.SegmentDisplay)
     .config(['$routeProvider', ($routeProvider: ng.route.IRouteProvider) =>{
         $routeProvider
             .when('/ride',
             {
-                controller: 'rideController',
+                controller: controllers.Names.Ride,
                 templateUrl: 'views/ride.html'
             })
             .when('/home',
             {
-                controller: 'homeController',
+                controller: controllers.Names.Home,
                 templateUrl: 'views/home.html'
             })
             .when('/calibrate',
             {
-                controller: 'calibrateController',
+                controller: controllers.Names.Calibrate,
                 templateUrl: 'views/calibrate.html'
             })
             .otherwise({redirectTo: '/home'});

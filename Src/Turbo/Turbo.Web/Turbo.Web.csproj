@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="content\angular-carousel.css" />
+    <Content Include="content\bootstrap.css" />
     <Content Include="content\font-awesome\css\font-awesome.css" />
     <Content Include="content\font-awesome\css\font-awesome.min.css" />
     <Content Include="content\font-awesome\fonts\fontawesome-webfont.svg" />
@@ -38,10 +39,11 @@
     <Content Include="scripts\angular.min.js" />
     <TypeScriptCompile Include="scripts\app.ts" />
     <TypeScriptCompile Include="scripts\services\calibrator.ts" />
-    <TypeScriptCompile Include="scripts\typings\angular-route.d.ts" />
-    <TypeScriptCompile Include="scripts\typings\angular.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular-route.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="scripts\typings\d3\d3.d.ts" />
-    <TypeScriptCompile Include="scripts\typings\jquery.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\angularjs\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\services\sensor.ts" />
     <TypeScriptCompile Include="scripts\services\turboService.ts" />
     <TypeScriptCompile Include="scripts\typings\node.d.ts" />
@@ -53,8 +55,10 @@
     <TypeScriptCompile Include="scripts\utilities.ts" />
     <Content Include="scripts\vendor\angular-carousel.js" />
     <Content Include="scripts\vendor\angular-touch.js" />
+    <Content Include="scripts\vendor\ui.bootstrap.js" />
     <Content Include="views\calibrate.html" />
     <Content Include="views\home.html" />
+    <Content Include="views\modals\calibration-capture.html" />
     <Content Include="views\ride.html" />
     <Content Include="web.config" />
   </ItemGroup>

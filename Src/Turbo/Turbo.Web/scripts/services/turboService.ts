@@ -1,4 +1,4 @@
-///<reference path="../typings/angular.d.ts"/>
+///<reference path="../typings/angularjs/angular.d.ts"/>
 
 import Utilities = require('../Utilities')
 import Sensor = require('./sensor')
