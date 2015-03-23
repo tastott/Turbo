@@ -125,6 +125,18 @@ export class RollingAggregator implements Aggregator {
     }
 }
 
+export class RollingRevometer extends RollingAggregator {
+    constructor(windowLength: number) {
+        super(windowLength,(times: number[]) => {
+            var now = new Date().getTime();
+            var seconds = (now - times[0]) / 1000;
+
+            if (!seconds) return 0;
+            else return times.length / seconds;
+        });
+    }
+}
+
 export class RollingSpeedometer extends RollingAggregator {
 
     constructor(windowLength: number, unitDistance: number) {

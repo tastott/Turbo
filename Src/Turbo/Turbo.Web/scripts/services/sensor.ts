@@ -34,17 +34,20 @@ import Q = require('q')
     
     export class PlaybackSensorListener extends BaseSensorListener implements ISensorListener {
         private timer: NodeJS.Timer;
-        private offset: number;
+        private data: number[];
+        private startTime: number;
 
-        constructor(private data: number[]) {
+        constructor(originalData: number[],
+            private playbackRate: number = 1) {
             super();
 
-
+            if (!originalData || !originalData.length) this.data = [];
+            else this.data = originalData.map(od => (od - originalData[0]) / this.playbackRate);
         }
 
         private doNext() {
             if (this.data.length) {
-                var nextTime = this.data.shift() + this.offset;
+                var nextTime = this.data.shift() + this.startTime;
                 var delay = Math.max(0, nextTime - new Date().getTime());
                 this.timer = setTimeout(() => {
                     this.onInput(nextTime);
@@ -54,7 +57,7 @@ import Q = require('q')
         }
 
         start() {
-            this.offset = new Date().getTime() - this.data[0];
+            this.startTime = new Date().getTime();
             this.doNext();
         }
 

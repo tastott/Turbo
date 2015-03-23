@@ -4,6 +4,8 @@ import Service = require('./services/turboService')
 import calib = require('./services/calibrator')
 import m = require('./models/metric')
 import sensor = require('./services/sensor')
+import _ = require('underscore')
+import prom = require('./utilities/promises')
 
 //import d3 = require('d3')
 
@@ -31,33 +33,40 @@ export class HomeController {
 
 export class CalibrationController {
 
+    private curves: calib.PowerCurveResult[];
+
     constructor(private $scope,
         private $location: ng.ILocationService,
-        private $modal : ng.ui.bootstrap.IModalService) {
+        private $modal: ng.ui.bootstrap.IModalService,
+        private $q : ng.IQService) {
 
         $scope.start = this.start;
         $scope.stop = this.stop;
+
+        this.curves = [];
     }
 
     start = () => {
         
-        
+        var results: calib.PowerCurveResult[] = [];
 
-        this.CapturePowerCurve(0);
+        prom.AllInSequence(_.range(3).map(i => () => this.CapturePowerCurve(i)))
+            .then((curves: calib.PowerCurveResult[]) => {
+                console.log(curves);
+            });
     }
 
-    private CapturePowerCurve(index: number) { //: Q.Promise<calib.PowerCurveResult>{
+    private CapturePowerCurve(ordinal: number) : ng.IPromise<calib.PowerCurveResult>{
 
         var modal = this.$modal.open({
             controller: Names.CalibrationCapture,
-            templateUrl: 'views/modals/calibration-capture.html'
+            templateUrl: 'views/modals/calibration-capture.html',
+            resolve: {
+                ordinal: () => ordinal
+            }
         });
 
-        modal.result
-            .then(result => {
-                console.log(result);
-            });
-        
+        return modal.result;   
     }
 
     //chartPowerCurve(curveResult: calib.PowerCurveResult) {
@@ -83,32 +92,57 @@ export class CalibrationController {
 
 }
 
+export interface CalibrationCaptureScope extends ng.IScope {
+    Ok(): void;
+    Cancel(): void;
+    CurveResult: calib.PowerCurveResult;
+    WheelSpeedKph: number;
+}
+
 export class CalibrationCaptureController {
     private capture: calib.PowerCurveCapture;
+    private captureInterval: ng.IPromise<any>;
 
-    constructor(private $scope,
-        private $modalInstance: ng.ui.bootstrap.IModalServiceInstance) {
+    constructor(private $scope: CalibrationCaptureScope,
+        private $interval : ng.IIntervalService,
+        private $modalInstance: ng.ui.bootstrap.IModalServiceInstance,
+        ordinal : number) {
         $scope.Ok = this.Ok;
         $scope.Cancel = this.Cancel;
+        $scope.CurveResult = null;
 
-
-        return;
-        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[0].Wheel),
-            () => new sensor.PlaybackSensorListener(dummyData.datasets[0].Crank));
+        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[ordinal].Wheel, 3),
+            () => new sensor.PlaybackSensorListener(dummyData.datasets[ordinal].Crank, 3));
 
         this.capture.Capture()
-            .then(curve => $modalInstance.close(curve))
+            .then(curve => {
+                $scope.$apply(() => $scope.CurveResult = curve);
+            })
             .fail(() => {
-            $modalInstance.dismiss('Capture failed');
-        });           
+                $modalInstance.dismiss('Capture failed');
+            }); 
+        
+        this.captureInterval = $interval(
+            () => {
+                var data = this.capture.GetData();
+                $scope.WheelSpeedKph = m.Convert(_.find(data, metric => metric.Name == 'Wheel speed'), m.Unit.KilometresPerHour);
+            },
+            1000
+        );          
+    }
+
+    private FinishCapture() {
+        this.$interval.cancel(this.captureInterval);
     }
 
     Ok = () => {
-        this.$modalInstance.close('ok');
+        this.FinishCapture();
+        this.$modalInstance.close(this.$scope.CurveResult);
     }
 
     Cancel = () => {
-        this.$modalInstance.dismiss('cancel');
+        this.FinishCapture();
+        this.$modalInstance.dismiss('Cancel');
     }
 }
 

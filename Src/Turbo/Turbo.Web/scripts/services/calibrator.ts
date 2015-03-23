@@ -5,6 +5,8 @@ import sensor = require('./sensor')
 import agg = require('./aggregation')
 import _ = require('underscore')
 import d = require('../models/dictionary')
+import met = require('../models/metric')
+
 var stats = require('simple-statistics')
 
 export enum EventType {
@@ -92,9 +94,27 @@ export class PowerCurveCapture {
             .length;
 
     }
+
+    GetData(): Array<met.TargetedMetric> {
+        if (this.turboSession) {
+            var data = this.turboSession.GetData();
+            return [
+                {
+                    Name: 'Wheel speed',
+                    Unit: met.Unit.RevolutionsPerSecond,
+                    Value: data['Wheel']["Speed"],
+                    Target: {
+                        Unit: met.Unit.RevolutionsPerSecond,
+                        Value: this.minInitialWheelRps
+                    }
+                }
+            ];
+
+        }
+        else return null;
+    }
     
     Stop(): Q.Promise<void> {
-
 
         if (this.checkSession) {
             clearInterval(this.checkSession);
@@ -111,7 +131,8 @@ export class PowerCurveCapture {
                     GetSensor: this.makeWheelSensor,
                     GetAggregators: context => {
                         return {
-                            "Data": new agg.DataCollector(10000)
+                            "Data": new agg.DataCollector(10000),
+                            "Speed": new agg.RollingRevometer(3000)
                         };
                     }
                 },
@@ -119,7 +140,8 @@ export class PowerCurveCapture {
                     GetSensor: this.makeCrankSensor,
                     GetAggregators: context => {
                         return {
-                            "Data": new agg.DataCollector(10000)
+                            "Data": new agg.DataCollector(10000),
+                            "Cadence" : new agg.RollingCadenceometer(3000)
                         };
                     }
                 }

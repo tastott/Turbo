@@ -61,6 +61,7 @@
     <Content Include="views\modals\calibration-capture.html" />
     <Content Include="views\ride.html" />
     <Content Include="web.config" />
+    <TypeScriptCompile Include="scripts\utilities\promises.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\font-awesome\less\bordered-pulled.less" />

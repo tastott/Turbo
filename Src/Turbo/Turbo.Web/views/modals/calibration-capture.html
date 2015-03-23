@@ -1,4 +1,7 @@
-﻿<button ng-click="Ok()">
+﻿
+<div class="numeric-display">{{WheelSpeedKph.toFixed(2)}}km/h</div>
+
+<button ng-click="Ok()" ng-show="CurveResult != null">
     OK
 </button>
 <button ng-click="Cancel()">Cancel</button>
