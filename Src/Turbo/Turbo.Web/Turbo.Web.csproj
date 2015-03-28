@@ -22,11 +22,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="content\angular-carousel.css" />
+    <Content Include="content\bootstrap-turbo.css" />
     <Content Include="content\bootstrap.css" />
     <Content Include="content\font-awesome\css\font-awesome.css" />
     <Content Include="content\font-awesome\css\font-awesome.min.css" />
     <Content Include="content\font-awesome\fonts\fontawesome-webfont.svg" />
     <Content Include="content\style.css" />
+    <Content Include="content\style.min.css">
+      <DependentUpon>style.css</DependentUpon>
+    </Content>
     <Content Include="index.html" />
     <TypeScriptCompile Include="scripts\appShim.ts" />
     <TypeScriptCompile Include="scripts\controllers.ts" />
@@ -39,6 +43,7 @@
     <Content Include="scripts\angular.min.js" />
     <TypeScriptCompile Include="scripts\app.ts" />
     <TypeScriptCompile Include="scripts\services\calibrator.ts" />
+    <TypeScriptCompile Include="scripts\services\configService.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
@@ -99,6 +104,10 @@
     <Content Include="package.json" />
     <Content Include="data\power.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="content\style.less" />
+    <Content Include="content\style.css.map">
+      <DependentUpon>style.css</DependentUpon>
     </Content>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>

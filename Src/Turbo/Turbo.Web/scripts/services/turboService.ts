@@ -9,8 +9,7 @@ import Q = require('q');
 import Aggregation = require('./aggregation')
 import d = require('../models/dictionary')
 import m = require('../models/models')
-
-var powerCurve : m.PowerCurve = require('../../data/power.json')
+import cs = require('./configService')
 
 export interface SessionContext {
     Id: string;
@@ -63,7 +62,9 @@ export class TurboService {
     private _session: TurboSession;
     private config: TurboConfig;
 
-    constructor(makeWheelSensor: () => Sensor.ISensorListener,
+    constructor(
+        configService: cs.ConfigService,
+        makeWheelSensor: () => Sensor.ISensorListener,
         makeCrankSensor: () => Sensor.ISensorListener,
         private logPath: string) {
 
@@ -82,6 +83,9 @@ export class TurboService {
                         var speedo = new Aggregation.Speedometer(odometer, timer);
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
                         var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.tireCircumference, 3000);
+
+                        var powerCurve = configService.GetPowerCurve();
+                        if (!powerCurve) throw 'No power curve loaded.';
 
                         var result: d.Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,

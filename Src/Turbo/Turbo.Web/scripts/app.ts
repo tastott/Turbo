@@ -4,6 +4,7 @@
 import Args = require('./args')
 import Sensor = require('./services/sensor')
 import Service = require('./services/turboService')
+import cs = require('./services/configService')
 import controllers = require('./controllers')
 var nwgui = (<any>window).require('nw.gui');
 
@@ -24,12 +25,14 @@ function GetSensor(pin, fakeFrequency :number) : Sensor.ISensorListener{
 
 var wAngular: ng.IAngularStatic = (<any>window).angular; //Dirty workaround because statically-loaded scripts aren't available as global variables in this context
 wAngular.module('turboApp', ['ngRoute', 'angular-carousel', 'ui.bootstrap'])
-    .service('args', () => _args)
-    .service('turboService', ['args', args => {
+    .service('args',() => _args)
+    .value('config', new cs.ConfigService())
+    .service('turboService', ['args', 'config', (args : any, config : cs.ConfigService)  => {
         var wheelSensorPin = args['wheel-sensor'];
         var crankSensorPin = args['crank-sensor'];
 
-        return new Service.TurboService(() => GetSensor(wheelSensorPin, 10),
+        return new Service.TurboService(config,
+            () => GetSensor(wheelSensorPin, 10),
             () => GetSensor(crankSensorPin, 1.5),
             _args['logs']);
     }])

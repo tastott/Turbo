@@ -6,6 +6,8 @@ import m = require('./models/metric')
 import sensor = require('./services/sensor')
 import _ = require('underscore')
 import prom = require('./utilities/promises')
+import Q = require('q')
+import cs = require('./services/configService')
 
 //import d3 = require('d3')
 
@@ -31,28 +33,62 @@ export class HomeController {
     }
 }
 
+export interface CalibrationControllerScope extends ng.IScope {
+    Start: () => void;
+    Exit: () => void;
+    Accept: () => void;
+    CurveResult: calib.PowerCurveResult;
+}
+
 export class CalibrationController {
 
     private curves: calib.PowerCurveResult[];
 
-    constructor(private $scope,
+    constructor(private $scope : CalibrationControllerScope,
         private $location: ng.ILocationService,
         private $modal: ng.ui.bootstrap.IModalService,
-        private $q : ng.IQService) {
+        private config: cs.ConfigService) {
 
-        $scope.start = this.start;
-        $scope.stop = this.stop;
+        $scope.Start = this.start;
+        $scope.Exit = this.stop;
+        $scope.Accept = this.accept;
 
         this.curves = [];
     }
 
+    accept = () => {
+
+        if (!this.$scope.CurveResult || !this.$scope.CurveResult.Curve)
+            throw 'No curve to save';
+
+        this.config.SavePowerCurve(this.$scope.CurveResult.Curve);
+        this.$location.path('#/home');
+    }
+
     start = () => {
-        
+        this.curves = [];
+        this.$scope.CurveResult = null;
+
         var results: calib.PowerCurveResult[] = [];
 
         prom.AllInSequence(_.range(3).map(i => () => this.CapturePowerCurve(i)))
             .then((curves: calib.PowerCurveResult[]) => {
-                console.log(curves);
+                var agg = calib.AggregateCurveResults(curves);
+                //this.$scope.CurveResult = agg;
+                this.$scope.CurveResult = {
+                    Curve: {
+                        Coefficient: 1,
+                        Exponent: 2,
+                        Fit: 0.95
+                    },
+                    Data: [
+                        { Power: 1, Speed: 1 },
+                        { Power: 1, Speed: 1 }
+                    ],
+                    IgnoredData: [
+                        { Power: 1, Speed: 1 },
+                    ]
+                };
             });
     }
 
@@ -95,8 +131,10 @@ export class CalibrationController {
 export interface CalibrationCaptureScope extends ng.IScope {
     Ok(): void;
     Cancel(): void;
+    Redo(): void;
     CurveResult: calib.PowerCurveResult;
     WheelSpeedKph: number;
+    IgnoredDataProportion: () => number;
 }
 
 export class CalibrationCaptureController {
@@ -106,43 +144,95 @@ export class CalibrationCaptureController {
     constructor(private $scope: CalibrationCaptureScope,
         private $interval : ng.IIntervalService,
         private $modalInstance: ng.ui.bootstrap.IModalServiceInstance,
-        ordinal : number) {
+        private ordinal : number) {
         $scope.Ok = this.Ok;
         $scope.Cancel = this.Cancel;
+        $scope.Redo = this.Redo;
         $scope.CurveResult = null;
 
-        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[ordinal].Wheel, 3),
-            () => new sensor.PlaybackSensorListener(dummyData.datasets[ordinal].Crank, 3));
+        $scope.IgnoredDataProportion = () => {
+            if ($scope.CurveResult
+                && $scope.CurveResult.Data
+                && $scope.CurveResult.IgnoredData
+                && $scope.CurveResult.Data.length + $scope.CurveResult.IgnoredData.length) {
+
+                return $scope.CurveResult.IgnoredData.length / ($scope.CurveResult.Data.length + $scope.CurveResult.IgnoredData.length);
+
+            }
+            else return null;
+               
+        };
+
+        //this.StartCapture();
+        $scope.CurveResult = {
+            Curve: {
+                Coefficient: 1,
+                Exponent: 2,
+                Fit: 0.95
+            },
+            Data: [
+                { Power: 1, Speed: 1 },
+                { Power: 1, Speed: 1 }
+            ],
+            IgnoredData: [
+                { Power: 1, Speed: 1 },
+            ]
+        };
+    }
+
+    private StartCapture(): void {
+
+        if (this.capture != null) throw 'Capture already started.';
+
+        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Wheel, 3),
+            () => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Crank, 3));
 
         this.capture.Capture()
             .then(curve => {
-                $scope.$apply(() => $scope.CurveResult = curve);
+                this.$scope.$apply(() => this.$scope.CurveResult = curve);
             })
             .fail(() => {
-                $modalInstance.dismiss('Capture failed');
-            }); 
+                this.$modalInstance.dismiss('Capture failed');
+            });
         
-        this.captureInterval = $interval(
+        this.captureInterval = this.$interval(
             () => {
                 var data = this.capture.GetData();
-                $scope.WheelSpeedKph = m.Convert(_.find(data, metric => metric.Name == 'Wheel speed'), m.Unit.KilometresPerHour);
+                this.$scope.WheelSpeedKph = m.Convert(_.find(data, metric => metric.Name == 'Wheel speed'), m.Unit.KilometresPerHour);
             },
             1000
-        );          
+        );       
     }
 
-    private FinishCapture() {
-        this.$interval.cancel(this.captureInterval);
+    private FinishCapture() : Q.Promise<void>{
+        if(this.captureInterval) this.$interval.cancel(this.captureInterval);
+
+        if (this.capture) return this.capture.Stop();
+        else return Q(<void>null);
     }
 
     Ok = () => {
-        this.FinishCapture();
-        this.$modalInstance.close(this.$scope.CurveResult);
+        this.FinishCapture()
+            .then(() => {
+                this.$modalInstance.close(this.$scope.CurveResult);
+            });
     }
 
     Cancel = () => {
-        this.FinishCapture();
-        this.$modalInstance.dismiss('Cancel');
+        this.FinishCapture()
+            .then(() => {
+                this.$modalInstance.dismiss('Cancel');
+            });
+    }
+
+    Redo = () => {
+
+        this.$scope.CurveResult = null;
+        this.FinishCapture()
+            .then(() => {
+                console.log("before redo");
+                this.StartCapture();
+            });
     }
 }
 
@@ -155,7 +245,7 @@ export class RideController {
 
     constructor($scope,
         turboService: Service.TurboService,
-        $location
+        $location : ng.ILocationService
         ) {
         $scope.distance = 0;
         $scope.speed = 0;

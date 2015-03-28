@@ -1,9 +1,31 @@
-﻿<h1>Calibration</h1>
-<div>
-    <div class="big-button" ng-click="start()">
+﻿<h1 class="numeric-display">Calibration</h1>
+
+<div ng-show="CurveResult == null">
+    <div class="big-button" ng-click="Start()">
         <div class="fa fa-play"></div>
     </div>
-    <div class="big-button" ng-click="stop()">
-        <div class="fa fa-stop"></div>
+    <div class="big-button" ng-click="Exit()">
+        <div class="fa fa-times"></div>
     </div>
 </div>
+<div ng-show="CurveResult != null">
+
+    <div class="small-numeric-display">Coeff: {{CurveResult.Curve.Coefficient.toFixed(2)}}</div>
+    <div class="small-numeric-display">Exponent: {{CurveResult.Curve.Exponent.toFixed(2)}}</div>
+    <div class="small-numeric-display">Fit: {{CurveResult.Curve.Fit.toFixed(2)}}</div>
+    <div class="small-numeric-display">Ignored data: {{(IgnoredDataProportion() * 100).toFixed(0)}}%</div>
+
+    <div class="big-button" ng-click="Accept()">
+        <div class="fa fa-check"></div>
+    </div>
+
+    <div class="big-button" ng-click="Start()">
+        <div class="fa fa-refresh"></div>
+    </div>
+
+    <div class="big-button" ng-click="Exit()">
+        <div class="fa fa-times"></div>
+    </div>
+</div>
+
+

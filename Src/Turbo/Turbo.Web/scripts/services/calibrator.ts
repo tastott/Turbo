@@ -95,11 +95,11 @@ export class PowerCurveCapture {
 
     }
 
-    GetData(): Array<met.TargetedMetric> {
+    GetData(): d.Dictionary<met.TargetedMetric> {
         if (this.turboSession) {
             var data = this.turboSession.GetData();
-            return [
-                {
+            return {
+                "Wheel speed": {
                     Name: 'Wheel speed',
                     Unit: met.Unit.RevolutionsPerSecond,
                     Value: data['Wheel']["Speed"],
@@ -108,7 +108,7 @@ export class PowerCurveCapture {
                         Value: this.minInitialWheelRps
                     }
                 }
-            ];
+            };
 
         }
         else return null;
@@ -219,6 +219,27 @@ function DoPowerRegression(data: number[][]): m.PowerCurve {
             Coefficient:coefficient,
             Exponent: exponent,
             Fit: fit
+        };
+    }
+}
+
+export function AggregateCurveResults(results: PowerCurveResult[]): PowerCurveResult {
+    var data = _.chain(results).map(r => r.Data).flatten().value();
+    var ignoredData = _.chain(results).map(r => r.IgnoredData).flatten().value();
+
+    var curve = DoPowerRegression(data.map(d => [d.Speed, d.Power]));
+
+    if (!curve) {
+        return {
+            ErrorMessage: "Power regression for data failed",
+            Data: data,
+            IgnoredData: ignoredData
+        };
+    } else {
+        return {
+            Curve: curve,
+            Data: data,
+            IgnoredData: ignoredData
         };
     }
 }
