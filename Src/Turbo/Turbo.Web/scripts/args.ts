@@ -1,4 +1,4 @@
-﻿///<reference path="typings/node.d.ts" />
+﻿///<reference path="typings/node/node.d.ts" />
 
 var nwgui = (<any>window).require('nw.gui');
 var minimist = require('minimist');

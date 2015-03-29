@@ -51,12 +51,13 @@
     <TypeScriptCompile Include="scripts\typings\angularjs\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\services\sensor.ts" />
     <TypeScriptCompile Include="scripts\services\turboService.ts" />
-    <TypeScriptCompile Include="scripts\typings\node.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\node\node.d.ts" />
     <Content Include="scripts\args.ts" />
     <Content Include="scripts\services\data\wheel-stops.js" />
     <Content Include="scripts\services\onoff.js" />
     <TypeScriptCompile Include="scripts\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="scripts\typings\q\Q.d.ts" />
+    <TypeScriptCompile Include="scripts\typings\winston\winston.d.ts" />
     <TypeScriptCompile Include="scripts\utilities.ts" />
     <Content Include="scripts\vendor\angular-carousel.js" />
     <Content Include="scripts\vendor\angular-touch.js" />

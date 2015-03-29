@@ -1,1 +1,1 @@
-nw ./ --dev-mode
+nw ./ --dev-mode --app-log logs/app.log

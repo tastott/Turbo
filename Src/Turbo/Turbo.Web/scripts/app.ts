@@ -6,9 +6,16 @@ import Sensor = require('./services/sensor')
 import Service = require('./services/turboService')
 import cs = require('./services/configService')
 import controllers = require('./controllers')
+import winston = require('winston')
 var nwgui = (<any>window).require('nw.gui');
 
 var _args = Args.GetCLArgs();
+
+if (_args['app-log']) winston.add(winston.transports.File, { filename: _args['app-log'] });
+
+winston.log('info', 'Launching app', { "launch-args": _args });
+
+process.on('exit',() => winston.log('info', 'Exiting app'));
 
 //Fiddle a few things in dev mode
 if (_args['dev-mode']) {
@@ -34,7 +41,7 @@ wAngular.module('turboApp', ['ngRoute', 'angular-carousel', 'ui.bootstrap'])
         return new Service.TurboService(config,
             () => GetSensor(wheelSensorPin, 10),
             () => GetSensor(crankSensorPin, 1.5),
-            _args['logs']);
+            _args['data-logs']);
     }])
     .controller(controllers.Names.Home, controllers.HomeController)
     .controller(controllers.Names.Ride, controllers.RideController)

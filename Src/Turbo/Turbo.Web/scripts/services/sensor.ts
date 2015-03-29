@@ -1,5 +1,5 @@
 ///<reference path="../utilities.ts"/>
-///<reference path="../typings/node.d.ts" />
+///<reference path="../typings/node/node.d.ts" />
 import Q = require('q')
 
 //export module Sensor {

@@ -15,7 +15,8 @@
     "onoff": "^1.0.0",
     "q": "^1.1.2",
     "simple-statistics": "^0.9.0",
-    "underscore": "^1.7.0"
+    "underscore": "^1.7.0",
+    "winston": "^0.9.0"
   },
   "version": "1.0.0",
   "devDependencies": {},

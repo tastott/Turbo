@@ -1,4 +1,4 @@
-///<reference path="../typings/node.d.ts" />
+///<reference path="../typings/node/node.d.ts" />
 import fs = require('fs');
 import path = require('path')
 import m = require('../models/models')
