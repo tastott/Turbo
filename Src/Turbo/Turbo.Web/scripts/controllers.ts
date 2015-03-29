@@ -220,9 +220,15 @@ export class CalibrationCaptureController {
         }
 
         this.capture.Capture()
-            .then(curve => {
-                this.logger.Info("Finished power curve capture.", { ordinal: this.ordinal, curve: curve });
-                this.$scope.$apply(() => this.$scope.CurveResult = curve);
+            .then(result => {
+                if (result.ErrorMessage) {
+                    this.logger.Info("Finished power curve capture.", { ordinal: this.ordinal, curve: result.Curve});
+                    this.$scope.$apply(() => this.$scope.CurveResult = result);
+                }
+                else {
+                    this.logger.Info("Power curve capture failed.", { ordinal: this.ordinal, curveError: result.ErrorMessage });
+                    this.$modalInstance.dismiss('Capture failed');
+                }
             })
             .fail(() => {
                 this.$modalInstance.dismiss('Capture failed');

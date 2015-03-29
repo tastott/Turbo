@@ -11,27 +11,30 @@ export interface ConfigService {
 
 export class DummyConfigService implements ConfigService {
 
-    private curve: m.PowerCurve;
+    private config: m.Config;
 
     constructor() {
-        this.curve = {
-            Coefficient: 1,
-            Exponent: 2,
-            Fit: 1
+        this.config = {
+            PowerCurve: {
+                Exponent: 2,
+                Coefficient: 1,
+                Fit: 0
+            },
+            TyreCircumference: 2.155
         };
     }
 
     SetPowerCurve(curve: m.PowerCurve) : void {
-        this.curve = curve;
+        this.config.PowerCurve = curve;
     }
 
     Get(): m.Config {
-        var copy = extend(true, {}, this.curve);
+        var copy = extend(true, {}, this.config);
         return copy;
     }
 }
 
-export class FileConfigService {
+export class FileConfigService implements ConfigService{
 
     private config: m.Config;
   
@@ -69,8 +72,9 @@ export class FileConfigService {
         this.config.PowerCurve = curve;
     }
 
-    GetPowerCurve(): m.PowerCurve {
-        return this.config.PowerCurve;
+    Get(): m.Config {
+        var copy = extend(true, {}, this.config);
+        return copy;
     }
 
     private Save(): void {
