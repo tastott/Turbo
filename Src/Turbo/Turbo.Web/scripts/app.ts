@@ -26,7 +26,7 @@ function GetSensor(pin, fakeFrequency :number) : Sensor.ISensorListener{
 var wAngular: ng.IAngularStatic = (<any>window).angular; //Dirty workaround because statically-loaded scripts aren't available as global variables in this context
 wAngular.module('turboApp', ['ngRoute', 'angular-carousel', 'ui.bootstrap'])
     .service('args',() => _args)
-    .value('config', new cs.ConfigService())
+    .value('config', _args['config'] ? new cs.FileConfigService(_args['config']) : new cs.DummyConfigService())
     .service('turboService', ['args', 'config', (args : any, config : cs.ConfigService)  => {
         var wheelSensorPin = args['wheel-sensor'];
         var crankSensorPin = args['crank-sensor'];

@@ -61,7 +61,7 @@ export class CalibrationController {
         if (!this.$scope.CurveResult || !this.$scope.CurveResult.Curve)
             throw 'No curve to save';
 
-        this.config.SavePowerCurve(this.$scope.CurveResult.Curve);
+        this.config.SetPowerCurve(this.$scope.CurveResult.Curve);
         this.$location.path('#/home');
     }
 

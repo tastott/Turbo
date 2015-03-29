@@ -14,7 +14,7 @@ body {
 }
 .dashboard {
   color: #86fd06;
-  height: calc(60%);
+  height: calc(100% - 40px);
   margin: 0;
 }
 .dashboard > li {
