@@ -8,8 +8,10 @@ import _ = require('underscore')
 import prom = require('./utilities/promises')
 import Q = require('q')
 import cs = require('./services/configService')
+import ls = require('./services/logService')
+import ss = require('./services/sensorService')
 
-//import d3 = require('d3')
+var _devMode: boolean = require('./args').GetCLArgs()['dev-mode'];
 
 var nwgui = (<any>window).require('nw.gui');
 var dummyData = require('./services/data/wheel-stops');
@@ -47,7 +49,8 @@ export class CalibrationController {
     constructor(private $scope : CalibrationControllerScope,
         private $location: ng.ILocationService,
         private $modal: ng.ui.bootstrap.IModalService,
-        private config: cs.ConfigService) {
+        private config: cs.ConfigService,
+        private logger: ls.LogService) {
 
         $scope.Start = this.start;
         $scope.Exit = this.stop;
@@ -61,11 +64,15 @@ export class CalibrationController {
         if (!this.$scope.CurveResult || !this.$scope.CurveResult.Curve)
             throw 'No curve to save';
 
+        this.logger.Info("New power curve accepted.", { curve: this.$scope.CurveResult.Curve });
         this.config.SetPowerCurve(this.$scope.CurveResult.Curve);
         this.$location.path('#/home');
     }
 
     start = () => {
+
+        this.logger.Info('Starting calibration');
+
         this.curves = [];
         this.$scope.CurveResult = null;
 
@@ -73,22 +80,31 @@ export class CalibrationController {
 
         prom.AllInSequence(_.range(3).map(i => () => this.CapturePowerCurve(i)))
             .then((curves: calib.PowerCurveResult[]) => {
+                this.logger.Info('Aggregating power curve data', { captures: curves.length });
                 var agg = calib.AggregateCurveResults(curves);
-                //this.$scope.CurveResult = agg;
-                this.$scope.CurveResult = {
-                    Curve: {
-                        Coefficient: 1,
-                        Exponent: 2,
-                        Fit: 0.95
-                    },
-                    Data: [
-                        { Power: 1, Speed: 1 },
-                        { Power: 1, Speed: 1 }
-                    ],
-                    IgnoredData: [
-                        { Power: 1, Speed: 1 },
-                    ]
-                };
+                
+
+
+                if (!_devMode) this.$scope.CurveResult = agg;
+                else {
+                    this.$scope.CurveResult = {
+                        Curve: {
+                            Coefficient: 1,
+                            Exponent: 2,
+                            Fit: 0.95
+                        },
+                        Data: [
+                            { Power: 1, Speed: 1 },
+                            { Power: 1, Speed: 1 }
+                        ],
+                        IgnoredData: [
+                            { Power: 1, Speed: 1 },
+                        ]
+                    };
+                }
+            })
+            .fail(error => {
+                this.logger.Info("Capture aborted or failed", { error: error });
             });
     }
 
@@ -122,7 +138,7 @@ export class CalibrationController {
     //}
 
     stop = () => {
-        console.log('Exiting calibration');
+        this.logger.Info('Exiting calibration');
         this.$location.path('#/home');
     }
 
@@ -144,7 +160,9 @@ export class CalibrationCaptureController {
     constructor(private $scope: CalibrationCaptureScope,
         private $interval : ng.IIntervalService,
         private $modalInstance: ng.ui.bootstrap.IModalServiceInstance,
-        private ordinal : number) {
+        private ordinal: number,
+        private sensorService: ss.SensorService,
+        private logger : ls.LogService) {
         $scope.Ok = this.Ok;
         $scope.Cancel = this.Cancel;
         $scope.Redo = this.Redo;
@@ -163,32 +181,47 @@ export class CalibrationCaptureController {
                
         };
 
-        //this.StartCapture();
-        $scope.CurveResult = {
-            Curve: {
-                Coefficient: 1,
-                Exponent: 2,
-                Fit: 0.95
-            },
-            Data: [
-                { Power: 1, Speed: 1 },
-                { Power: 1, Speed: 1 }
-            ],
-            IgnoredData: [
-                { Power: 1, Speed: 1 },
-            ]
-        };
+        if (!_devMode) {
+            this.StartCapture();
+        }
+        else {
+            $scope.CurveResult = {
+                Curve: {
+                    Coefficient: 1,
+                    Exponent: 2,
+                    Fit: 0.95
+                },
+                Data: [
+                    { Power: 1, Speed: 1 },
+                    { Power: 1, Speed: 1 }
+                ],
+                IgnoredData: [
+                    { Power: 1, Speed: 1 },
+                ]
+            };
+        }
     }
 
     private StartCapture(): void {
 
+        this.logger.Info("Starting power curve capture", { oridinal: this.ordinal });
+
         if (this.capture != null) throw 'Capture already started.';
 
-        this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Wheel, 3),
-            () => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Crank, 3));
+        if (!_devMode) {
+            this.capture = new calib.PowerCurveCapture(
+                () => this.sensorService.MakeSensor(ss.SensorType.Wheel),
+                () => this.sensorService.MakeSensor(ss.SensorType.Crank)
+             );
+        }
+        else {
+            this.capture = new calib.PowerCurveCapture(() => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Wheel, 3),
+                () => new sensor.PlaybackSensorListener(dummyData.datasets[this.ordinal].Crank, 3));
+        }
 
         this.capture.Capture()
             .then(curve => {
+                this.logger.Info("Finished power curve capture.", { ordinal: this.ordinal, curve: curve });
                 this.$scope.$apply(() => this.$scope.CurveResult = curve);
             })
             .fail(() => {
@@ -230,7 +263,6 @@ export class CalibrationCaptureController {
         this.$scope.CurveResult = null;
         this.FinishCapture()
             .then(() => {
-                console.log("before redo");
                 this.StartCapture();
             });
     }

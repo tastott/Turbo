@@ -38,3 +38,6 @@
 /Src/Turbo/Turbo.Web/content/style.css.map
 /Src/Turbo/Turbo.Web/content/style.min.css
 /Src/Turbo/Turbo.Web/scripts/services/configService.js
+/Src/Turbo/Turbo.Web/scripts/services/logService.js
+/Src/Turbo/Turbo.Web/scripts/services/sensorService.js
+/Src/Turbo/Turbo.Web/scripts/utilities/jsonReader.js

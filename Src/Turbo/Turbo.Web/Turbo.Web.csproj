@@ -44,6 +44,8 @@
     <TypeScriptCompile Include="scripts\app.ts" />
     <TypeScriptCompile Include="scripts\services\calibrator.ts" />
     <TypeScriptCompile Include="scripts\services\configService.ts" />
+    <TypeScriptCompile Include="scripts\services\logService.ts" />
+    <TypeScriptCompile Include="scripts\services\sensorService.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular-route.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angular-ui-bootstrap\angular-ui-bootstrap.d.ts" />
     <TypeScriptCompile Include="scripts\typings\angularjs\angular.d.ts" />
@@ -51,6 +53,7 @@
     <TypeScriptCompile Include="scripts\typings\angularjs\jquery.d.ts" />
     <TypeScriptCompile Include="scripts\services\sensor.ts" />
     <TypeScriptCompile Include="scripts\services\turboService.ts" />
+    <TypeScriptCompile Include="scripts\typings\extend\extend.d.ts" />
     <TypeScriptCompile Include="scripts\typings\node\node.d.ts" />
     <Content Include="scripts\args.ts" />
     <Content Include="scripts\services\data\wheel-stops.js" />
@@ -67,6 +70,7 @@
     <Content Include="views\modals\calibration-capture.html" />
     <Content Include="views\ride.html" />
     <Content Include="web.config" />
+    <TypeScriptCompile Include="scripts\utilities\jsonReader.ts" />
     <TypeScriptCompile Include="scripts\utilities\promises.ts" />
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,12 @@
-﻿import fs = require('fs')
+﻿import jr = require('../utilities/jsonReader')
 import m = require('../models/models')
+import ls = require('./logService')
+import fs = require('fs')
+import extend = require('extend')
 
 export interface ConfigService {
     SetPowerCurve(curve: m.PowerCurve): void;
-    GetPowerCurve(): m.PowerCurve;
+    Get(): m.Config
 }
 
 export class DummyConfigService implements ConfigService {
@@ -22,21 +25,44 @@ export class DummyConfigService implements ConfigService {
         this.curve = curve;
     }
 
-    GetPowerCurve(): m.PowerCurve {
-        return this.curve;
+    Get(): m.Config {
+        var copy = extend(true, {}, this.curve);
+        return copy;
     }
 }
 
 export class FileConfigService {
 
     private config: m.Config;
-
-    constructor(private path: string) {
+  
+    constructor(private path: string,
+        private logger: ls.LogService
+     ) {
         if (fs.existsSync(path)) {
-            var configJson = fs.readFileSync(path, 'utf8');
-            this.config = JSON.parse(configJson);
+            try {
+                this.config = jr.readJsonSync(path);
+                this.logger.Info('Successfully loaded config from file.' , { path: path, config: this.config });
+            }
+            catch (error) {
+                this.logger.Error('Error occurred while parsing config file. Using default config.', error, { path: path });
+                this.LoadDefaultConfig();
+            }
         }
-        else throw 'Config file not found at ' + path;
+        else {
+            this.logger.Info('Config file not found. Using default config.', { path: path });
+            this.LoadDefaultConfig();
+        }
+    }
+
+    private LoadDefaultConfig(): void {
+        this.config = {
+            PowerCurve: {
+                Exponent: 2,
+                Coefficient: 1,
+                Fit: 0
+            },
+            TyreCircumference: 2.155
+        };
     }
 
     SetPowerCurve(curve: m.PowerCurve) {
@@ -50,6 +76,7 @@ export class FileConfigService {
     private Save(): void {
         var json = JSON.stringify(this.config);
         fs.writeFile(this.path, json, error => {
+            this.logger.Error('Error occurred while writing config to file.', error, { path: this.path }); 
         });
     }
 } 

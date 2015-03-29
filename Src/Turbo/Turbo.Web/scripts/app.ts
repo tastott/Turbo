@@ -6,16 +6,17 @@ import Sensor = require('./services/sensor')
 import Service = require('./services/turboService')
 import cs = require('./services/configService')
 import controllers = require('./controllers')
-import winston = require('winston')
+import ls = require('./services/logService')
+import ss = require('./services/sensorService')
+
 var nwgui = (<any>window).require('nw.gui');
 
 var _args = Args.GetCLArgs();
+var logger = new ls.WinstonLogService(_args['app-log']);
 
-if (_args['app-log']) winston.add(winston.transports.File, { filename: _args['app-log'] });
+logger.Info('Launching app', { "launch-args": _args });
 
-winston.log('info', 'Launching app', { "launch-args": _args });
-
-process.on('exit',() => winston.log('info', 'Exiting app'));
+process.on('exit',() => logger.Info('Exiting app'));
 
 //Fiddle a few things in dev mode
 if (_args['dev-mode']) {
@@ -32,17 +33,32 @@ function GetSensor(pin, fakeFrequency :number) : Sensor.ISensorListener{
 
 var wAngular: ng.IAngularStatic = (<any>window).angular; //Dirty workaround because statically-loaded scripts aren't available as global variables in this context
 wAngular.module('turboApp', ['ngRoute', 'angular-carousel', 'ui.bootstrap'])
-    .service('args',() => _args)
-    .value('config', _args['config'] ? new cs.FileConfigService(_args['config']) : new cs.DummyConfigService())
-    .service('turboService', ['args', 'config', (args : any, config : cs.ConfigService)  => {
-        var wheelSensorPin = args['wheel-sensor'];
-        var crankSensorPin = args['crank-sensor'];
-
-        return new Service.TurboService(config,
-            () => GetSensor(wheelSensorPin, 10),
-            () => GetSensor(crankSensorPin, 1.5),
-            _args['data-logs']);
+    .value('args', _args)
+    .value('logger', logger)
+    .service('config', ['args', 'logger', (args: any, logger: ls.LogService) => {
+        return args['config']
+            ? new cs.FileConfigService(args['config'], logger)
+            : new cs.DummyConfigService();
     }])
+    .service('sensorService', ['args', 'config', 'logger',
+        (args: any, config: cs.ConfigService, logger: ls.LogService) => {
+            var wheelSensorPin = args['wheel-sensor'];
+            var crankSensorPin = args['crank-sensor'];
+
+            var sensors : any = {
+                "Wheel": () => GetSensor(wheelSensorPin, 10),
+                "Crank": () => GetSensor(crankSensorPin, 1.5)
+            };
+
+            return new ss.SensorService(sensors);
+        }
+    ])
+    .service('turboService', ['args', 'config', 'logger', 'sensorService',
+        (args: any, config: cs.ConfigService, logger : ls.LogService, sensorService: ss.SensorService) => {
+            
+            return new Service.TurboService(config,logger, sensorService, _args['data-logs']);
+        }
+    ])
     .controller(controllers.Names.Home, controllers.HomeController)
     .controller(controllers.Names.Ride, controllers.RideController)
     .controller(controllers.Names.Calibrate, controllers.CalibrationController)

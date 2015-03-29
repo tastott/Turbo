@@ -1,1 +1,1 @@
-nw ./ --dev-mode --app-log logs/app.log
+nw ./ --dev-mode --app-log logs/app.log --config data/config.jsonx

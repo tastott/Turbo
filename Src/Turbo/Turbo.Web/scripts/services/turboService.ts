@@ -10,6 +10,8 @@ import Aggregation = require('./aggregation')
 import d = require('../models/dictionary')
 import m = require('../models/models')
 import cs = require('./configService')
+import ls = require('./logService')
+import ss = require('./sensorService')
 
 export interface SessionContext {
     Id: string;
@@ -64,34 +66,33 @@ export class TurboService {
 
     constructor(
         configService: cs.ConfigService,
-        makeWheelSensor: () => Sensor.ISensorListener,
-        makeCrankSensor: () => Sensor.ISensorListener,
+        private logger: ls.LogService,
+        private sensorService : ss.SensorService,
         private logPath: string) {
 
-        var bike = {
-            tireCircumference: 2.155
-        };
+        var bike = configService.Get();
+        if (!bike) throw 'No config loaded.';
 
         this.config = {
             SensorConfigs: {
                 "Wheel": {
-                    GetSensor: makeWheelSensor,
+                    GetSensor: () => this.sensorService.MakeSensor(ss.SensorType.Wheel),
                     GetAggregators: (context) => {
                         var counter = new Aggregation.Counter();
-                        var odometer = new Aggregation.Odometer(bike.tireCircumference);
+                        var odometer = new Aggregation.Odometer(bike.TyreCircumference);
                         var timer = new Aggregation.Timer();
                         var speedo = new Aggregation.Speedometer(odometer, timer);
                         var speedSeries = new Aggregation.RollingTimeSeries(speedo, 3000, 15);
-                        var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.tireCircumference, 3000);
+                        var realLifeSpeedo = new Aggregation.SimpleRealLifeSpeedModel(wheelSpeed => wheelSpeed * 0.5, 1.22, 0.31, bike.TyreCircumference, 3000);
 
-                        var powerCurve = configService.GetPowerCurve();
+                        var powerCurve = bike.PowerCurve;
                         if (!powerCurve) throw 'No power curve loaded.';
 
                         var result: d.Dictionary<Aggregation.Aggregator> = {
                             'Count': counter,
                             'Timer': timer,
                             'AverageSpeed': speedo,
-                            'CurrentAverageSpeed': new Aggregation.RollingSpeedometer(3000, bike.tireCircumference),
+                            'CurrentAverageSpeed': new Aggregation.RollingSpeedometer(3000, bike.TyreCircumference),
                             'Distance': odometer,
                             'SpeedSeries': speedSeries,
                             'RealLifeSpeed': realLifeSpeedo,
@@ -106,7 +107,7 @@ export class TurboService {
                     }
                 },
                 "Crank": {
-                    GetSensor: makeCrankSensor,
+                    GetSensor: () => this.sensorService.MakeSensor(ss.SensorType.Crank),
                     GetAggregators: (context) => {
                         var result : d.Dictionary<Aggregation.Aggregator> = {
                             "Cadence": new Aggregation.RollingCadenceometer(5000)

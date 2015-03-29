@@ -1,6 +1,10 @@
 ﻿
 <div ng-show="CurveResult == null">
     <div class="numeric-display">{{WheelSpeedKph.toFixed(2)}}km/h</div>
+
+    <div class="big-button" ng-click="Cancel()">
+        <div class="fa fa-stop"></div>
+    </div>
 </div>
 
 <div ng-show="CurveResult != null">
