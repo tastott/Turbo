@@ -162,7 +162,7 @@
   <Import Project="$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(VSToolsPath)\TypeScript\Microsoft.TypeScript.targets')" />
   <Target Name="AfterBuild">
     <ItemGroup>
-      <DeploymentFiles Include="**\*.*" Exclude="obj\**;bin\**;logs\**;**\*.ts" />
+      <DeploymentFiles Include="**\*.*" Exclude="obj\**;bin\**;logs\**;**\*.ts;node_modules\**" />
     </ItemGroup>
     <Zip Files="@(DeploymentFiles)" ZipFileName="..\..\..\Release\Turbo.nw" />
   </Target>
