@@ -128,6 +128,7 @@ export class TurboService {
 
     private MakeLogger(context: SessionContext, name: string) {
         var filePath = Utilities.resolve(this.logPath + '/' + context.Id + '/' + name + '.log');
+        this.logger.Info("Creating log file for sensor data", { sensor: name, path: filePath });
         return new Aggregation.LogFile(filePath, 100);
     }
 
